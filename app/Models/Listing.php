@@ -31,7 +31,7 @@ class Listing extends Model
 
     public function carModel()
     {
-        return $this->belongsTo(CarModel::class);
+        return $this->belongsTo(CarModel::class,'model_id');
     }
 
     public function fuel()

@@ -20,21 +20,21 @@ class CarDataSeeder extends Seeder
         CarModel::create(['brand_id' => $toyota->id, 'name' => 'Corolla']);
         CarModel::create(['brand_id' => $toyota->id, 'name' => 'Yaris']);
 
-        CarModel::create(['brand_id' => $bmw->id, 'name' => '3 Series']);
-        CarModel::create(['brand_id' => $bmw->id, 'name' => '5 Series']);
+        CarModel::create(['brand_id' => $bmw->id, 'name' => 'Seria 3']);
+        CarModel::create(['brand_id' => $bmw->id, 'name' => 'Seria 5']);
 
         CarModel::create(['brand_id' => $audi->id, 'name' => 'A3']);
         CarModel::create(['brand_id' => $audi->id, 'name' => 'A4']);
 
         Fuel::insert([
-            ['name' => 'Petrol', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Benzyna', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Diesel', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Hybrid', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Hybryda', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
         Transmission::insert([
-            ['name' => 'Manual', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Automatic', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Manuala', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Automatyczna', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
         BodyType::insert([

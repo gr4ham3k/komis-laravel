@@ -1,5 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\Dictionary\BodyTypeController;
+use App\Http\Controllers\Admin\Dictionary\BrandController;
+use App\Http\Controllers\Admin\Dictionary\FuelController;
+use App\Http\Controllers\Admin\Dictionary\ModelController;
+use App\Http\Controllers\Admin\Dictionary\TransmissionController;
+use App\Http\Controllers\Admin\DictionaryController;
 use App\Http\Controllers\ListingController;
 use Illuminate\Support\Facades\Route;
 
@@ -9,3 +15,29 @@ Route::get('/', function () {
 
 Route::get('/listing/{id}',[ListingController::class,'show']);
 Route::get('/listings/create',[ListingController::class,'create']);
+
+
+Route::prefix('admin/dictionaries')->group(function () {
+    Route::get('/',[DictionaryController::class,'index']);
+
+    Route::post('/brands',[BrandController::class,'store'])->name('admin.dictionaries.brands.store');
+    Route::delete('/brands/{id}',[BrandController::class,'destroy'])->name('admin.dictionaries.brands.destroy');
+    Route::patch('/brands/{id}',[BrandController::class,'update'])->name('admin.dictionaries.brands.update');
+
+    Route::post('/models',[ModelController::class,'store'])->name('admin.dictionaries.models.store');
+    Route::delete('/models/{id}',[ModelController::class,'destroy'])->name('admin.dictionaries.models.destroy');
+    Route::patch('/models/{id}',[ModelController::class,'update'])->name('admin.dictionaries.models.update');
+
+    Route::post('/fuels',[FuelController::class,'store'])->name('admin.dictionaries.fuels.store');
+    Route::delete('/fuels/{id}',[FuelController::class,'destroy'])->name('admin.dictionaries.fuels.destroy');
+    Route::patch('/fuels/{id}',[FuelController::class,'update'])->name('admin.dictionaries.fuels.update');
+
+    Route::post('/transmissions',[TransmissionController::class,'store'])->name('admin.dictionaries.transmissions.store');
+    Route::delete('/transmissions/{id}',[TransmissionController::class,'destroy'])->name('admin.dictionaries.transmissions.destroy');
+    Route::patch('/transmissions/{id}',[TransmissionController::class,'update'])->name('admin.dictionaries.transmissions.update');
+
+    Route::post('/body-types',[BodyTypeController::class,'store'])->name('admin.dictionaries.bodies.store');
+    Route::delete('/body-types/{id}',[BodyTypeController::class,'destroy'])->name('admin.dictionaries.bodies.destroy');
+    Route::patch('/body-types/{id}',[BodyTypeController::class,'update'])->name('admin.dictionaries.bodies.update');
+
+});

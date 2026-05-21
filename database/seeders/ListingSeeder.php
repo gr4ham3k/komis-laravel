@@ -26,10 +26,10 @@ class ListingSeeder extends Seeder
 
         $bmw = Brand::where('name', 'BMW')->first();
 
-        $bmw3 = CarModel::where('name', '3 Series')->first();
+        $bmw3 = CarModel::where('name', 'Seria 3')->first();
 
         $diesel = Fuel::where('name', 'Diesel')->first();
-        $auto = Transmission::where('name', 'Automatic')->first();
+        $auto = Transmission::where('name', 'Automatyczna')->first();
         $sedan = BodyType::where('name', 'Sedan')->first();
 
         $listing = Listing::create([
@@ -39,7 +39,7 @@ class ListingSeeder extends Seeder
             'fuel_id' => $diesel->id,
             'transmission_id' => $auto->id,
             'body_type_id' => $sedan->id,
-            'title' => 'BMW 3 Series 320d',
+            'title' => 'BMW Seria 3 320d',
             'description' => 'Zadbane BMW, serwisowane, stan bardzo dobry.',
             'price' => 45000,
             'status' => 'active',

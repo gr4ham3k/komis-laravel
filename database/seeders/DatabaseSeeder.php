@@ -20,7 +20,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ImageSeeder::class,
             CarDataSeeder::class,
-            ListingSeeder::class
+            ListingSeeder::class,
+            TagSeeder::class
         ]);
 
         User::factory()->create([

@@ -21,8 +21,7 @@
 
                         @foreach ($listing->images as $index => $image)
                             <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                <img src="{{ asset('images/' . $image->file_name) }}" class="d-block w-100"
-                                    alt="{{ $image->original_name }}">
+                                <img src="{{ asset('storage/listings/' . $image->file_name) }}" class="d-block w-100">
                             </div>
                         @endforeach
 
@@ -40,9 +39,9 @@
                 </div>
 
                 <div class="mb-2">
-                    <span class="badge bg-dark">#SUV</span>
-                    <span class="badge bg-dark">#Diesel</span>
-                    <span class="badge bg-dark">#Bezwypadkowy</span>
+                    @foreach ($listing->tags as $tag)
+                        <span class="badge bg-dark">#{{ $tag->name }}</span>
+                    @endforeach
                 </div>
 
                 <div class="card mb-3">
@@ -59,18 +58,34 @@
 
                         <div class="row">
                             <div class="col-md-6">
+                                <p>🚗 Marka pojazdu: {{ $listing->brand->name }}</p>
+                                <p>🚙 Model pojazdu: {{ $listing->carModel->name }}</p>
+                                <p>🚘 Typ nadwozia: {{ $listing->bodyType->name }}</p>
                                 <p>📍 Miasto: {{ $listing->city }}</p>
                                 <p>📅 Rok: {{ $listing->year }}</p>
-                                <p>🚗 Przebieg: {{ $listing->mileage }} km</p>
+                                <p>🛣️ Przebieg: {{ $listing->mileage }} km</p>
+
                             </div>
 
                             <div class="col-md-6">
-                                <p>⚙️ Moc: {{ $listing->power_hp }} KM</p>
+                                <p>⚙️ Skrzynia biegów: {{ $listing->transmission->name }}</p>
+                                <p>💪 Moc: {{ $listing->power_hp }} KM</p>
+                                <p>🔧 Pojemność silnika: {{ $listing->engine_capacity }}</p>
                                 <p>🎨 Kolor: {{ $listing->color }}</p>
                                 <p>⛽ Paliwo: {{ $listing->fuel->name }}</p>
                             </div>
                         </div>
 
+                    </div>
+                </div>
+
+                <div class="card mt-3 mb-3">
+                    <div class="card-body">
+                        <h5>Lokalizacja</h5>
+
+                        <iframe width="100%" height="300" style="border:0" loading="lazy" allowfullscreen
+                            src="https://www.google.com/maps?q={{ urlencode($listing->city) }}&output=embed">;
+                        </iframe>
                     </div>
                 </div>
 
@@ -80,6 +95,15 @@
 
                 <div class="card mb-3">
                     <div class="card-body">
+
+                        <p>
+                            Status:
+                            @if ($listing->status === 'active')
+                                <span class="badge bg-success">Aktywne</span>
+                            @else
+                                <span class="badge bg-secondary">Nieaktywne</span>
+                            @endif
+                        </p>
 
                         <h3 class="mb-1">{{ $listing->title }}</h3>
 
@@ -92,7 +116,11 @@
                         <p><strong>Sprzedający:</strong> {{ $listing->user->name }}</p>
 
                         <div class="mt-3">
-                            <button class="btn btn-primary w-100">Napisz do sprzedającego</button>
+                            <form method="post">
+                                @csrf
+                                <button class="btn btn-primary w-100">Napisz do sprzedającego</button>
+                            </form>
+
                         </div>
 
                     </div>

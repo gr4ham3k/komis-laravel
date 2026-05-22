@@ -13,12 +13,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/listing/{id}',[ListingController::class,'show']);
-Route::get('/listings/create',[ListingController::class,'create']);
+Route::get('/listing/{id}',[ListingController::class,'show'])->name('listings.show');
+Route::get('/listings/create',[ListingController::class,'create'])->name('listings.create');
+Route::post('/listings/create',[ListingController::class,'store'])->name('listings.store');
 
 
 Route::prefix('admin/dictionaries')->group(function () {
-    Route::get('/',[DictionaryController::class,'index']);
+    Route::get('/',[DictionaryController::class,'index'])->name('admin.dictionaries.index');
 
     Route::post('/brands',[BrandController::class,'store'])->name('admin.dictionaries.brands.store');
     Route::delete('/brands/{id}',[BrandController::class,'destroy'])->name('admin.dictionaries.brands.destroy');

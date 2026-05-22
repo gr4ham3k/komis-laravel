@@ -22,6 +22,8 @@ class Listing extends Model
         'mileage',
         'engine_capacity',
         'power_hp',
+        'views_count',
+        'color'
     ];
 
     public function brand()
@@ -31,7 +33,7 @@ class Listing extends Model
 
     public function carModel()
     {
-        return $this->belongsTo(CarModel::class,'model_id');
+        return $this->belongsTo(CarModel::class, 'model_id');
     }
 
     public function fuel()
@@ -41,21 +43,28 @@ class Listing extends Model
 
     public function transmission()
     {
-        return $this -> belongsTo(Transmission::class);
+        return $this->belongsTo(Transmission::class);
     }
 
     public function bodyType()
     {
-        return $this -> belongsTo(BodyType::class);
+        return $this->belongsTo(BodyType::class);
     }
 
     public function user()
     {
-        return $this -> belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function images()
     {
-        return $this->belongsToMany(Image::class, 'listing_images') -> withPivot('sort_order') -> orderBy('pivot_sort_order');
+        return $this->belongsToMany(Image::class, 'listing_images')
+            ->withPivot('sort_order')
+            ->orderBy('listing_images.sort_order');
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'listing_tags');
     }
 }

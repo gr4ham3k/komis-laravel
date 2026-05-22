@@ -21,8 +21,7 @@
 
                         @foreach ($listing->images as $index => $image)
                             <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                <img src="{{ asset('images/' . $image->file_name) }}" class="d-block w-100"
-                                    alt="{{ $image->original_name }}">
+                                <img src="{{ asset('storage/listings/' . $image->file_name) }}" class="d-block w-100">
                             </div>
                         @endforeach
 
@@ -39,14 +38,9 @@
                     </button>
                 </div>
 
-                @php
-                    //do usuniecia jak beda tagi
-                    $tags = ['SUV', 'Diesel', 'Bezwypadkowy'];
-                @endphp
-
                 <div class="mb-2">
-                    @foreach ($tags as $tag)
-                        <span class="badge bg-dark">#{{ $tag }}</span>
+                    @foreach ($listing->tags as $tag)
+                        <span class="badge bg-dark">#{{ $tag->name }}</span>
                     @endforeach
                 </div>
 

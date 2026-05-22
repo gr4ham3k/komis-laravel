@@ -21,7 +21,8 @@ class DatabaseSeeder extends Seeder
             ImageSeeder::class,
             CarDataSeeder::class,
             ListingSeeder::class,
-            TagSeeder::class
+            TagSeeder::class,
+            ServiceSeeder::class
         ]);
 
         User::factory()->create([

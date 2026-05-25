@@ -1,175 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+@extends('layouts.app')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        .gradient-custom-3 {
-            background: #84fab0;
-
-            background: -webkit-linear-gradient(
-                to right,
-                rgba(132,250,176,0.5),
-                rgba(143,211,244,0.5)
-            );
-
-            background: linear-gradient(
-                to right,
-                rgba(132,250,176,0.5),
-                rgba(143,211,244,0.5)
-            );
-        }
-
-        .gradient-custom-4 {
-            background: #84fab0;
-
-            background: -webkit-linear-gradient(
-                to right,
-                rgba(132,250,176,1),
-                rgba(143,211,244,1)
-            );
-
-            background: linear-gradient(
-                to right,
-                rgba(132,250,176,1),
-                rgba(143,211,244,1)
-            );
-        }
-
-        body{
-            min-height:100vh;
-        }
-
-        .card{
-            border-radius:20px;
-        }
-
-        .form-control{
-            padding:12px;
-        }
-    </style>
-</head>
-<body>
-
-<section class="vh-100 gradient-custom-3">
-
-    <div class="container h-100">
-
-        <div class="row d-flex justify-content-center align-items-center h-100">
-
-            <div class="col-md-8 col-lg-6 col-xl-5">
-
-                <div class="card shadow-lg">
-
-                    <div class="card-body p-5">
-
-                        <h2 class="text-uppercase text-center mb-4">
-                            Login
-                        </h2>
-
-                        <p class="text-center text-muted mb-4">
-                            Sign in to your account
-                        </p>
-
-
-                        
-                        @if(session('error'))
-                            <div class="alert alert-danger">
-                                {{ session('error') }}
-                            </div>
-                        @endif
-
-
-                        <!-- Validation errors -->
-                        @if($errors->any())
-                            <div class="alert alert-danger">
-                                <ul class="mb-0">
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-
-
-                        <form action="/login" method="POST">
-                            @csrf
-
-                            <div class="mb-4">
-
-                                <label class="form-label">
-                                    Email
-                                </label>
-
-                                <input
-                                    type="email"
-                                    name="email"
-                                    class="form-control"
-                                    placeholder="Enter email"
-                                    value="{{ old('email') }}"
-                                    required
-                                >
-
-                            </div>
-
-
-                            <div class="mb-4">
-
-                                <label class="form-label">
-                                    Password
-                                </label>
-
-                                <input
-                                    type="password"
-                                    name="password"
-                                    class="form-control"
-                                    placeholder="Enter password"
-                                    required
-                                >
-
-                            </div>
-
-
-                            <div class="d-grid">
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-lg text-white gradient-custom-4"
-                                >
-                                    Login
-                                </button>
-
-                            </div>
-
-
-                            <p class="text-center text-muted mt-4 mb-0">
-
-                                Don't have an account?
-
-                                <a href="/register"
-                                   class="fw-bold text-decoration-none">
-                                    Register
-                                </a>
-
-                            </p>
-
-                        </form>
-
-                    </div>
-
+@section('content')
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h1 class="h5 mb-0">Logowanie</h1>
                 </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ route('login.store') }}">
+                        @csrf
 
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input
+                                id="email"
+                                type="email"
+                                name="email"
+                                value="{{ old('email') }}"
+                                class="form-control @error('email') is-invalid @enderror"
+                                required
+                                autofocus
+                            >
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Haslo</label>
+                            <input
+                                id="password"
+                                type="password"
+                                name="password"
+                                class="form-control @error('password') is-invalid @enderror"
+                                required
+                            >
+                            @error('password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="remember" id="remember" value="1">
+                            <label class="form-check-label" for="remember">Zapamietaj mnie</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Zaloguj</button>
+                    </form>
+                </div>
             </div>
 
+            <div class="alert alert-info mt-3 mb-0">
+                <strong>Konta testowe:</strong><br>
+                Admin: <code>admin@komis.test</code> / <code>password</code><br>
+                Uzytkownik: <code>user@komis.test</code> / <code>password</code>
+            </div>
         </div>
-
     </div>
-
-</section>
-
-</body>
-</html>
+</div>
+@endsection

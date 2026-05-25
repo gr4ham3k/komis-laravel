@@ -1,68 +1,54 @@
-{{-- resources/views/services/create.blade.php --}}
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Dodaj usługę</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
+@extends('layouts.app')
 
-<div class="container my-4">
+@section('content')
+<div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
                 <div class="card-header">
-                    <h3>Dodaj nową usługę</h3>
+                    <h1 class="h5 mb-0">Dodaj usluge</h1>
                 </div>
                 <div class="card-body">
                     <form method="POST" action="{{ route('services.store') }}">
                         @csrf
-                        
                         <div class="mb-3">
-                            <label class="form-label">Tytuł usługi</label>
-                            <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" 
-                                   value="{{ old('title') }}" required>
+                            <label for="title" class="form-label">Tytul</label>
+                            <input id="title" type="text" name="title" value="{{ old('title') }}" class="form-control @error('title') is-invalid @enderror" required>
                             @error('title')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        
+
                         <div class="mb-3">
-                            <label class="form-label">Opis</label>
-                            <textarea name="description" class="form-control @error('description') is-invalid @enderror" 
-                                      rows="5" required>{{ old('description') }}</textarea>
+                            <label for="description" class="form-label">Opis</label>
+                            <textarea id="description" name="description" rows="4" class="form-control @error('description') is-invalid @enderror" required>{{ old('description') }}</textarea>
                             @error('description')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Cena (PLN)</label>
-                            <input type="number" step="0.01" name="price" class="form-control @error('price') is-invalid @enderror" 
-                                   value="{{ old('price') }}" required>
-                            @error('price')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="price" class="form-label">Cena (PLN)</label>
+                                <input id="price" type="number" step="0.01" min="0" name="price" value="{{ old('price') }}" class="form-control @error('price') is-invalid @enderror" required>
+                                @error('price')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="city" class="form-label">Miasto</label>
+                                <input id="city" type="text" name="city" value="{{ old('city') }}" class="form-control @error('city') is-invalid @enderror" required>
+                                @error('city')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Miasto</label>
-                            <input type="text" name="city" class="form-control @error('city') is-invalid @enderror" 
-                                   value="{{ old('city') }}" required>
-                            @error('city')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary w-100">Dodaj usługę</button>
+
+                        <button type="submit" class="btn btn-primary mt-4">Zapisz usluge</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+@endsection

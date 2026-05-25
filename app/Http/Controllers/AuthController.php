@@ -2,58 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\View\View;
 
 class AuthController extends Controller
 {
-    public function showRegister()
+    public function create(): View
     {
-        return view('auth.register');
+        return view('auth.login');
     }
 
-    public function register(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|confirmed|min:8'
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
         ]);
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'is_admin' => false,
-            'is_banned' => false
-        ]);
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+            return back()
+                ->withErrors(['email' => 'Nieprawidlowy email lub haslo.'])
+                ->onlyInput('email');
+        }
 
-        return redirect('/register')
-            ->with('success', 'Registration successful!');
+        $request->session()->regenerate();
+
+        if (Auth::user()?->is_banned) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()->withErrors(['email' => 'Konto jest zablokowane.']);
+        }
+
+        return redirect()->intended(route('home'))->with('success', 'Zalogowano pomyslnie.');
     }
 
-    public function showLogin()
-{
-    return view('auth.login');
-}
+    public function destroy(Request $request): RedirectResponse
+    {
+        Auth::logout();
 
-public function login(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required'
-    ]);
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-    $user = User::where('email', $request->email)->first();
-
-    if (!$user || !Hash::check($request->password, $user->password)) {
-        return back()->with('error', 'Invalid email or password');
+        return redirect()->route('home')->with('success', 'Zostales wylogowany.');
     }
-
-    Auth::login($user);
-
-    return redirect()->route('listings.index');
-}
 }

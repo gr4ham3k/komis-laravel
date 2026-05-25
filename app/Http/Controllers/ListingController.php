@@ -17,6 +17,15 @@ use Illuminate\Support\Str;
 
 class ListingController extends Controller
 {
+    public function index()
+    {
+        $listings = Listing::with(['images', 'tags', 'brand', 'carModel', 'fuel', 'transmission', 'bodyType', 'user'])
+            ->latest()
+            ->paginate(9);
+
+        return view('listings.index', compact('listings'));
+    }
+
     public function show($id)
     {
         $listing = Listing::with('images', 'tags')->findOrFail($id);

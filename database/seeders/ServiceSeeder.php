@@ -50,7 +50,10 @@ class ServiceSeeder extends Seeder
         ];
 
         foreach ($services as $serviceData) {
-            $service = Service::create([
+            $service = Service::firstOrCreate([
+                'user_id' => $user->id,
+                'title' => $serviceData['title'],
+            ], [
                 'user_id' => $user->id,
                 'title' => $serviceData['title'],
                 'description' => $serviceData['description'],
@@ -68,7 +71,7 @@ class ServiceSeeder extends Seeder
             ];
 
             foreach ($reviews as $reviewData) {
-                ServiceReview::create([
+                ServiceReview::firstOrCreate([
                     'service_id' => $service->id,
                     'user_id' => $user->id,
                     'rating' => $reviewData['rating'],

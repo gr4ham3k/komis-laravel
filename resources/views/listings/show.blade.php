@@ -1,139 +1,96 @@
-<!DOCTYPE html>
-<html lang="pl">
+@extends('layouts.site')
 
-<head>
-    <meta charset="UTF-8">
-    <title>Ogłoszenie</title>
+@section('title', $listing->title)
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+@section('content')
+    @php
+        $resolveImagePath = function ($fileName) {
+            if (! $fileName) {
+                return 'https://via.placeholder.com/800x420?text=Brak+zdjecia';
+            }
 
-<body>
+            if (str_starts_with($fileName, 'http://') || str_starts_with($fileName, 'https://')) {
+                return $fileName;
+            }
 
-    <div class="container my-4">
+            if (file_exists(public_path('images/' . $fileName))) {
+                return asset('images/' . $fileName);
+            }
 
-        <div class="row">
+            return asset('storage/listings/' . $fileName);
+        };
+    @endphp
 
-            <div class="col-md-8">
-
-                <div id="carouselExample" class="carousel slide mb-3">
-                    <div class="carousel-inner">
-
-                        @foreach ($listing->images as $index => $image)
-                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                <img src="{{ asset('storage/listings/' . $image->file_name) }}" class="d-block w-100">
-                            </div>
-                        @endforeach
-
-                    </div>
-
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample"
-                        data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon"></span>
-                    </button>
-
-                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample"
-                        data-bs-slide="next">
-                        <span class="carousel-control-next-icon"></span>
-                    </button>
-                </div>
-
-                <div class="mb-2">
-                    @foreach ($listing->tags as $tag)
-                        <span class="badge bg-dark">#{{ $tag->name }}</span>
-                    @endforeach
-                </div>
-
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5>Opis</h5>
-                        <p>{{ $listing->description }}</p>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-body">
-
-                        <h5>Specyfikacja</h5>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p>🚗 Marka pojazdu: {{ $listing->brand->name }}</p>
-                                <p>🚙 Model pojazdu: {{ $listing->carModel->name }}</p>
-                                <p>🚘 Typ nadwozia: {{ $listing->bodyType->name }}</p>
-                                <p>📍 Miasto: {{ $listing->city }}</p>
-                                <p>📅 Rok: {{ $listing->year }}</p>
-                                <p>🛣️ Przebieg: {{ $listing->mileage }} km</p>
-
-                            </div>
-
-                            <div class="col-md-6">
-                                <p>⚙️ Skrzynia biegów: {{ $listing->transmission->name }}</p>
-                                <p>💪 Moc: {{ $listing->power_hp }} KM</p>
-                                <p>🔧 Pojemność silnika: {{ $listing->engine_capacity }}</p>
-                                <p>🎨 Kolor: {{ $listing->color }}</p>
-                                <p>⛽ Paliwo: {{ $listing->fuel->name }}</p>
-                            </div>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div id="listingCarousel" class="carousel slide mb-3 bg-white border rounded shadow-sm overflow-hidden">
+                <div class="carousel-inner">
+                    @forelse ($listing->images as $index => $image)
+                        <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                            <img src="{{ $resolveImagePath($image->file_name) }}" class="d-block w-100" style="height: 420px; object-fit: cover;" alt="{{ $image->original_name }}">
                         </div>
-
-                    </div>
+                    @empty
+                        <div class="carousel-item active">
+                            <img src="https://via.placeholder.com/800x420?text=Brak+zdjecia" class="d-block w-100" style="height: 420px; object-fit: cover;" alt="Brak zdjecia">
+                        </div>
+                    @endforelse
                 </div>
-
-                <div class="card mt-3 mb-3">
-                    <div class="card-body">
-                        <h5>Lokalizacja</h5>
-
-                        <iframe width="100%" height="300" style="border:0" loading="lazy" allowfullscreen
-                            src="https://www.google.com/maps?q={{ urlencode($listing->city) }}&output=embed">;
-                        </iframe>
-                    </div>
-                </div>
-
+                <button class="carousel-control-prev" type="button" data-bs-target="#listingCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#listingCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
             </div>
 
-            <div class="col-md-4">
-
-                <div class="card mb-3">
-                    <div class="card-body">
-
-                        <p>
-                            Status:
-                            @if ($listing->status === 'active')
-                                <span class="badge bg-success">Aktywne</span>
-                            @else
-                                <span class="badge bg-secondary">Nieaktywne</span>
-                            @endif
-                        </p>
-
-                        <h3 class="mb-1">{{ $listing->title }}</h3>
-
-                        <h4 class="text-success">
-                            {{ $listing->price }} PLN
-                        </h4>
-
-                        <hr>
-
-                        <p><strong>Sprzedający:</strong> {{ $listing->user->name }}</p>
-
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <h2 class="h5">Opis</h2>
+                    <p class="mb-0">{{ $listing->description }}</p>
+                    @if ($listing->tags->isNotEmpty())
                         <div class="mt-3">
-                            <form method="post">
-                                @csrf
-                                <button class="btn btn-primary w-100">Napisz do sprzedającego</button>
-                            </form>
-
+                            @foreach ($listing->tags as $tag)
+                                <span class="badge text-bg-secondary me-1">{{ $tag->name }}</span>
+                            @endforeach
                         </div>
-
-                    </div>
+                    @endif
                 </div>
-
             </div>
 
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="h5">Specyfikacja</h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Marka:</strong> {{ optional($listing->brand)->name ?? 'Brak danych' }}</p>
+                            <p class="mb-2"><strong>Model:</strong> {{ optional($listing->carModel)->name ?? 'Brak danych' }}</p>
+                            <p class="mb-2"><strong>Miasto:</strong> {{ $listing->city }}</p>
+                            <p class="mb-2"><strong>Rok:</strong> {{ $listing->year }}</p>
+                            <p class="mb-2"><strong>Przebieg:</strong> {{ number_format($listing->mileage, 0, ',', ' ') }} km</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Paliwo:</strong> {{ optional($listing->fuel)->name ?? 'Brak danych' }}</p>
+                            <p class="mb-2"><strong>Skrzynia:</strong> {{ optional($listing->transmission)->name ?? 'Brak danych' }}</p>
+                            <p class="mb-2"><strong>Kolor:</strong> {{ $listing->color }}</p>
+                            <p class="mb-2"><strong>Pojemnosc:</strong> {{ $listing->engine_capacity }} cm3</p>
+                            <p class="mb-2"><strong>Moc:</strong> {{ $listing->power_hp }} KM</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h1 class="h4 mb-2">{{ $listing->title }}</h1>
+                    <p class="fs-3 fw-semibold text-success mb-3">{{ number_format((float) $listing->price, 0, ',', ' ') }} PLN</p>
+                    <p class="mb-2"><strong>Sprzedawca:</strong> {{ optional($listing->user)->name ?? 'Brak danych' }}</p>
+                    <p class="mb-2"><strong>Wyswietlenia:</strong> {{ $listing->views_count }}</p>
+                    <p class="text-secondary small mb-3">Dodano: {{ $listing->created_at->format('Y-m-d') }}</p>
+                    <button class="btn btn-primary w-100" type="button">Napisz do sprzedawcy</button>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-
-</html>
+@endsection

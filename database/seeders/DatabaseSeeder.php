@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -26,26 +25,9 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class
         ]);
 
-        User::query()->updateOrCreate(
-            ['email' => 'admin@komis.test'],
-            [
-                'name' => 'Admin',
-                'email' => 'admin@komis.test',
-                'password' => Hash::make('password'),
-                'is_admin' => true,
-                'is_banned' => false,
-            ]
-        );
-
-        User::query()->updateOrCreate(
-            ['email' => 'user@komis.test'],
-            [
-                'name' => 'Uzytkownik',
-                'email' => 'user@komis.test',
-                'password' => Hash::make('password'),
-                'is_admin' => false,
-                'is_banned' => false,
-            ]
-        );
+        User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ]);
     }
 }

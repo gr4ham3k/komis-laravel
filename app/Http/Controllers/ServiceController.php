@@ -1,46 +1,48 @@
 <?php
+// app/Http/Controllers/ServiceController.php
 
 namespace App\Http\Controllers;
 
 use App\Models\Service;
 use App\Models\ServiceReview;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
 class ServiceController extends Controller
 {
-    public function index(): View
+    public function index()
     {
         $services = Service::with('user', 'reviews')
             ->where('status', 'active')
             ->latest()
             ->paginate(12);
-
+        
         return view('services.index', compact('services'));
     }
 
-    public function show(int $id): View
+    public function show($id)
     {
-        $service = Service::with('user', 'reviews.user')->findOrFail($id);
+        $service = Service::with('user', 'reviews.user')
+            ->findOrFail($id);
+        
+        // Increment views count
         $service->increment('views_count');
-
+        
         return view('services.show', compact('service'));
     }
 
-    public function create(): View
+    public function create()
     {
         return view('services.create');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'price' => ['required', 'numeric', 'min:0'],
-            'city' => ['required', 'string', 'max:255'],
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'city' => 'required|string|max:255'
         ]);
 
         $service = Service::create([
@@ -49,95 +51,79 @@ class ServiceController extends Controller
             'description' => $validated['description'],
             'price' => $validated['price'],
             'city' => $validated['city'],
-            'status' => 'active',
+            'status' => 'active'
         ]);
 
-        return redirect()
-            ->route('services.show', $service->id)
-            ->with('success', 'Usluga zostala dodana.');
+        return redirect()->route('services.show', $service->id)
+            ->with('success', 'Usługa została dodana!');
     }
 
-    public function edit(int $id): View
+    public function edit($id)
     {
-        $service = $this->findManageableService($id);
-
+        $service = Service::where('user_id', Auth::id())->findOrFail($id);
         return view('services.edit', compact('service'));
     }
 
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(Request $request, $id)
     {
-        $service = $this->findManageableService($id);
-
+        $service = Service::where('user_id', Auth::id())->findOrFail($id);
+        
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'price' => ['required', 'numeric', 'min:0'],
-            'city' => ['required', 'string', 'max:255'],
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'city' => 'required|string|max:255'
         ]);
 
         $service->update($validated);
 
-        return redirect()
-            ->route('services.show', $service->id)
-            ->with('success', 'Usluga zostala zaktualizowana.');
+        return redirect()->route('services.show', $service->id)
+            ->with('success', 'Usługa została zaktualizowana!');
     }
 
-    public function destroy(int $id): RedirectResponse
+    public function destroy($id)
     {
-        $service = $this->findManageableService($id);
+        $service = Service::where('user_id', Auth::id())->findOrFail($id);
         $service->delete();
 
-        return redirect()
-            ->route('services.index')
-            ->with('success', 'Usluga zostala usunieta.');
+        return redirect()->route('services.index')
+            ->with('success', 'Usługa została usunięta!');
     }
 
-    public function addReview(Request $request, int $id): RedirectResponse
+    public function addReview(Request $request, $id)
     {
         $validated = $request->validate([
-            'rating' => ['required', 'integer', 'min:1', 'max:5'],
-            'comment' => ['nullable', 'string', 'max:1000'],
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:1000'
         ]);
 
         $service = Service::findOrFail($id);
 
-        $existingReview = ServiceReview::query()
-            ->where('service_id', $id)
+        // Check if user already reviewed this service
+        $existingReview = ServiceReview::where('service_id', $id)
             ->where('user_id', Auth::id())
             ->first();
 
         if ($existingReview) {
-            return back()->with('error', 'Ta usluga ma juz Twoja opinie.');
+            return back()->with('error', 'Już dodałeś opinię dla tej usługi!');
         }
 
         ServiceReview::create([
             'service_id' => $id,
             'user_id' => Auth::id(),
             'rating' => $validated['rating'],
-            'comment' => $validated['comment'] ?? null,
+            'comment' => $validated['comment']
         ]);
 
-        return back()->with('success', 'Dziekujemy za opinie.');
+        return back()->with('success', 'Dziękujemy za opinię!');
     }
 
-    public function myServices(): View
+    public function myServices()
     {
-        $services = Service::query()
-            ->where('user_id', Auth::id())
+        $services = Service::where('user_id', Auth::id())
             ->latest()
             ->paginate(10);
-
+        
         return view('services.my-services', compact('services'));
-    }
-
-    private function findManageableService(int $id): Service
-    {
-        $query = Service::query();
-
-        if (! Auth::user()?->is_admin) {
-            $query->where('user_id', Auth::id());
-        }
-
-        return $query->findOrFail($id);
     }
 }

@@ -2,32 +2,38 @@
 
 namespace Database\Seeders;
 
-use App\Models\Tag;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Tag;
 
 class TagSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
         $tags = [
-            'Automat',
             'Bezwypadkowy',
-            'Elektryczne szyby',
-            'Faktura VAT',
-            'Garażowany',
-            'Klimatyzacja',
-            'Manual',
-            'Możliwa zamiana',
             'Pierwszy właściciel',
             'Serwisowany w ASO',
-            'Skórzana tapicerka',
-            'Tuning',
-            'Uszkodzony',
+            'Garażowany',
             'Zarejestrowany w Polsce',
+            'Faktura VAT',
+            'Możliwa zamiana',
+            'Uszkodzony',
+            'Tuning',
+            'Automat',
+            'Manual',
+            'Klimatyzacja',
+            'Skórzana tapicerka',
+            'Elektryczne szyby',
         ];
 
-        foreach ($tags as $name) {
-            Tag::query()->updateOrCreate(['name' => $name], ['name' => $name]);
+        foreach ($tags as $tag) {
+            Tag::create([
+                'name' => $tag
+            ]);
         }
     }
 }

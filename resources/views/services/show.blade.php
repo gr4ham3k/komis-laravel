@@ -64,6 +64,16 @@
                     </div>
                 </div>
 
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Lokalizacja</h5>
+
+                        <iframe width="100%" height="300" style="border:0" loading="lazy" allowfullscreen
+                            src="https://www.google.com/maps?q={{ urlencode($service->city) }}&output=embed">
+                        </iframe>
+                    </div>
+                </div>
+
                 <!-- Reviews Section -->
                 <div class="card">
                     <div class="card-body">
@@ -128,17 +138,13 @@
                                 <i class="fas fa-envelope"></i> Napisz do usługodawcy
                             </button>
 
-                            <a href="{{ route('services.edit', $service->id) }}" class="btn btn-warning">
-                                <i class="fas fa-edit"></i> Edytuj
-                            </a>
-                            <form method="POST" action="{{ route('services.destroy', $service->id) }}"
-                                onsubmit="return confirm('Czy na pewno chcesz usunąć tę usługę?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger w-100 mt-2">
-                                    <i class="fas fa-trash"></i> Usuń
-                                </button>
-                            </form>
+                            @auth
+                                @if(Auth::user()->is_admin)
+                                    <a href="{{ route('admin.services.index') }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-gear"></i> Zarządzaj w panelu admina
+                                    </a>
+                                @endif
+                            @endauth
                         </div>
                     </div>
                 </div>

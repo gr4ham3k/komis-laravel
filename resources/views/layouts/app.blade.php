@@ -33,6 +33,13 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('services.index') }}">Usługi</a>
                     </li>
+                    @auth
+                        @if(Auth::user()->is_admin)
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('admin.services.index') }}">Admin usługi</a>
+                            </li>
+                        @endif
+                    @endauth
                 </ul>
                 
                 <ul class="navbar-nav">
@@ -46,21 +53,27 @@
                                 <li><a class="dropdown-item" href="{{ route('my.listings') }}">Moje ogłoszenia</a></li>
                                 <li><a class="dropdown-item" href="{{ route('my.services') }}">Moje usługi</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item">Wyloguj</button>
-                                    </form>
-                                </li>
+                                @if(Route::has('logout'))
+                                    <li>
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item">Wyloguj</button>
+                                        </form>
+                                    </li>
+                                @endif
                             </ul>
                         </li>
                     @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">Logowanie</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">Rejestracja</a>
-                        </li>
+                        @if(Route::has('login'))
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('login') }}">Logowanie</a>
+                            </li>
+                        @endif
+                        @if(Route::has('register'))
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('register') }}">Rejestracja</a>
+                            </li>
+                        @endif
                     @endauth
                 </ul>
             </div>

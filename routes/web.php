@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\Dictionary\ModelController;
 use App\Http\Controllers\Admin\Dictionary\TransmissionController;
 use App\Http\Controllers\Admin\DictionaryController;
 use App\Http\Controllers\ListingController;
+use App\Http\Controllers\ListingImageController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -16,10 +17,12 @@ Route::get('/', function () {
 });
 
 Route::get('/listings', [ListingController::class, 'index'])->name('listings.index');
-Route::get('/listing/{id}', [ListingController::class, 'show'])->name('listings.show');
 Route::get('/listings/create', [ListingController::class, 'create'])->name('listings.create');
 Route::post('/listings/create',[ListingController::class,'store'])->name('listings.store');
+Route::get('/listings/{listing}', [ListingController::class, 'show'])->name('listings.show');
 
+Route::get('listings/{listing}/images',[ListingImageController::class,'create'])->name('listings.images.create');
+Route::post('listings/{listing}/images',[ListingImageController::class,'store'])->name('listings.images.store');
 
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
 Route::get('/services/create', [ServiceController::class, 'create'])->name('services.create');

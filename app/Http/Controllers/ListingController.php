@@ -17,9 +17,9 @@ use Illuminate\Support\Str;
 
 class ListingController extends Controller
 {
-    public function show($id)
+    public function show(Listing $listing)
     {
-        $listing = Listing::with('images', 'tags')->findOrFail($id);
+        $listing->load('images', 'tags');
         return view('listings.show', compact('listing'));
     }
 
@@ -55,40 +55,17 @@ class ListingController extends Controller
             'engine_capacity' => 'required|integer',
             'power_hp' => 'required|integer',
 
-            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
             'tags' => 'array'
         ]);
 
         $validated['user_id'] = Auth::id() ?? 1; //DO ZMIANY JAK BEDA UZYTKOWNICY!!
-        $validated['status'] = 'active';
+        $validated['status'] = 'inactive';
         $validated['views_count'] = 0;
 
         $listing = Listing::create($validated);
 
         $listing->tags()->sync($request->tags ?? []);
 
-        if($request->hasFile('images'))
-        {
-            foreach($request->file('images') as $imageFile)
-            {
-                $uuid = (string) Str::uuid();
-                $extension = $imageFile->getClientOriginalExtension();
-
-                $fileName = $uuid . '.' . $extension;
-
-                $path = $imageFile->storeAs('listings',$fileName,'public');
-
-                $image = Image::create([
-                    'file_name' => $fileName,
-                    'original_name' => $imageFile->getClientOriginalName(),
-                    'file_type' => $imageFile->getClientMimeType(),
-                ]);
-
-                $listing->images()->attach($image->id);
-
-            }
-        }
-
-        return redirect()->route('listings.show',$listing->id)->with('success','Ogłoszenie zostało dodane!');
+        return redirect()->route('listings.images.create', $listing->id);
     }
 }

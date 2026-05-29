@@ -125,7 +125,7 @@
                         <p><strong>Sprzedający:</strong> {{ $listing->user->name }}</p>
 
                         <div class="mt-3">
-                            <form method="post">
+                            <form method="get" action="{{ route('conversations.start',$listing) }}">
                                 @csrf
                                 <button class="btn btn-primary w-100">Napisz do sprzedającego</button>
                             </form>

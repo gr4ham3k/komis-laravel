@@ -15,7 +15,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ]);
+
+        User::factory()->create([
+            'name' => 'Second User',
+            'email' => 'second@example.com',
+        ]);
 
         $this->call([
             ImageSeeder::class,
@@ -25,9 +33,5 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class
         ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
     }
 }

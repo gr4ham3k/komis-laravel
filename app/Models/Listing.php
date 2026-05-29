@@ -67,4 +67,9 @@ class Listing extends Model
     {
         return $this->belongsToMany(Tag::class, 'listing_tags');
     }
+
+    public function conversations()
+    {
+        return $this->hasMany(Conversation::class);
+    }
 }

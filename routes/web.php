@@ -9,7 +9,8 @@ use App\Http\Controllers\Admin\DictionaryController;
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\ListingImageController;
 use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -23,6 +24,13 @@ Route::get('/listings/{listing}', [ListingController::class, 'show'])->name('lis
 
 Route::get('listings/{listing}/images',[ListingImageController::class,'create'])->name('listings.images.create');
 Route::post('listings/{listing}/images',[ListingImageController::class,'store'])->name('listings.images.store');
+
+Route::get('/chat/start/{listingId}', [ConversationController::class, 'createOrOpenConversation'])->name('conversations.start');
+Route::get('/conversations', [ConversationController::class, 'index'])->name('conversations.index');
+Route::get('/conversations/{id}', [ConversationController::class, 'show'])->name('conversations.show');
+
+Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+Route::get('/conversations/{id}/messages', [MessageController::class, 'index']);
 
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
 Route::get('/services/create', [ServiceController::class, 'create'])->name('services.create');

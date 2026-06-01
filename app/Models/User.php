@@ -28,7 +28,17 @@ class User extends Authenticatable
 
     public function listings()
     {
-        return $this -> hasMany(Listing::class);
+        return $this->hasMany(Listing::class);
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function conversations()
+    {
+        return $this->hasMany(Conversation::class, 'user2_id');
     }
 
     /**

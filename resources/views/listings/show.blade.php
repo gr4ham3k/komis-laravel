@@ -21,7 +21,8 @@
 
                         @foreach ($listing->images as $index => $image)
                             <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                <img src="{{ asset('storage/listings/' . $image->file_name) }}" class="d-block w-100">
+                                <img src="{{ asset('storage/listings/' . $image->file_name) }}" class="d-block w-100"
+                                    style="height: 450px; object-fit: cover;">
                             </div>
                         @endforeach
 
@@ -37,6 +38,14 @@
                         <span class="carousel-control-next-icon"></span>
                     </button>
                 </div>
+
+                @if ($listing->images->count() === 0)
+                    <div class="mb-3 text-start">
+                        <a href="{{ route('listings.images.create', $listing->id) }}" class="btn btn-primary">
+                            ➕ Dodaj zdjęcia
+                        </a>
+                    </div>
+                @endif
 
                 <div class="mb-2">
                     @foreach ($listing->tags as $tag)
@@ -116,7 +125,7 @@
                         <p><strong>Sprzedający:</strong> {{ $listing->user->name }}</p>
 
                         <div class="mt-3">
-                            <form method="post">
+                            <form method="get" action="{{ route('conversations.start',$listing) }}">
                                 @csrf
                                 <button class="btn btn-primary w-100">Napisz do sprzedającego</button>
                             </form>

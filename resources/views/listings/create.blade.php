@@ -7,6 +7,7 @@
     <title>Dodaj ogłoszenie</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 
 <body class="bg-light">
@@ -45,15 +46,15 @@
                                 </div>
 
                                 <div class="col-md-4">
-                                    <label class="form-label">Miasto</label>
-                                    <input type="text" name="city" class="form-control"
-                                        value="{{ old('city') }}" required>
-                                </div>
-
-                                <div class="col-md-4">
                                     <label class="form-label">Rok produkcji</label>
                                     <input type="number" name="year" class="form-control"
                                         value="{{ old('year') }}" required>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Kolor</label>
+                                    <input type="text" name="color" class="form-control"
+                                        value="{{ old('color') }}" required>
                                 </div>
 
                                 <div class="col-md-6">
@@ -122,12 +123,6 @@
                                 </div>
 
                                 <div class="col-md-4">
-                                    <label class="form-label">Kolor</label>
-                                    <input type="text" name="color" class="form-control"
-                                        value="{{ old('color') }}" required>
-                                </div>
-
-                                <div class="col-md-4">
                                     <label class="form-label">Przebieg (km)</label>
                                     <input type="number" name="mileage" class="form-control"
                                         value="{{ old('mileage') }}" required>
@@ -145,9 +140,12 @@
                                         value="{{ old('power_hp') }}" required>
                                 </div>
 
-                                <div class="col-12">
-                                    <label class="form-label">Zdjęcia</label>
-                                    <input type="file" name="images[]" class="form-control" multiple>
+                                <div class="col-12 mb-3">
+                                    <label class="form-label">Wybierz lokalizację</label>
+
+                                    <div id="map" style="height: 350px; border-radius: 10px;"></div>
+
+                                    <input type="hidden" name="city" id="city">
                                 </div>
 
                                 <div class="col-12">
@@ -168,16 +166,14 @@
                                         @endforeach
                                     </div>
                                 </div>
-                                <form method="POST" action=" {{ route('listings.store') }} " enctype="multipart/form-data">
 
-                                    @csrf
+                                @csrf
 
-                                    <div class="col-12 mt-4">
-                                        <button class="btn btn-primary px-4">
-                                            Dodaj ogłoszenie
-                                        </button>
-                                    </div>
-                                </form>
+                                <div class="col-12 mt-4">
+                                    <button class="btn btn-primary px-4">
+                                        Dodaj ogłoszenie
+                                    </button>
+                                </div>
                             </div>
                         </form>
 
@@ -188,6 +184,42 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        const map = L.map('map').setView([50.0413, 21.9990], 6);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        let marker;
+
+        map.on('click', function(e) {
+
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            marker = L.marker(e.latlng).addTo(map);
+
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+                .then(res => res.json())
+                .then(data => {
+
+                    const city =
+                        data.address.city ||
+                        data.address.town ||
+                        data.address.village ||
+                        data.address.state ||
+                        '';
+
+                    document.getElementById('city').value = city;
+
+                    console.log("Wybrane miasto:", city);
+                });
+        });
+    </script>
 
 </body>
 

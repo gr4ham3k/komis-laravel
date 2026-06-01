@@ -37,7 +37,12 @@
 
 <div class="container py-4">
 
-    <h2 class="mb-4">Panel admina - Słowniki</h2>
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+        <h2 class="mb-0">Panel admina - Słowniki</h2>
+        <a href="{{ route('admin.services.index') }}" class="btn btn-outline-primary align-self-start">
+            Usługi
+        </a>
+    </div>
 
     <ul class="nav nav-tabs" id="dictTabs" role="tablist">
         <li class="nav-item">

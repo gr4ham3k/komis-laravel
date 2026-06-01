@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\Dictionary\FuelController;
 use App\Http\Controllers\Admin\Dictionary\ModelController;
 use App\Http\Controllers\Admin\Dictionary\TransmissionController;
 use App\Http\Controllers\Admin\DictionaryController;
+use App\Http\Controllers\Admin\ServiceAdminController;
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\ListingImageController;
 use App\Http\Controllers\ServiceController;
@@ -64,4 +65,11 @@ Route::prefix('admin/dictionaries')->group(function () {
     Route::delete('/body-types/{id}',[BodyTypeController::class,'destroy'])->name('admin.dictionaries.bodies.destroy');
     Route::patch('/body-types/{id}',[BodyTypeController::class,'update'])->name('admin.dictionaries.bodies.update');
 
+});
+
+Route::prefix('admin/services')->name('admin.services.')->group(function () {
+    Route::get('/', [ServiceAdminController::class, 'index'])->name('index');
+    Route::post('/', [ServiceAdminController::class, 'store'])->name('store');
+    Route::patch('/{id}', [ServiceAdminController::class, 'update'])->name('update');
+    Route::delete('/{id}', [ServiceAdminController::class, 'destroy'])->name('destroy');
 });

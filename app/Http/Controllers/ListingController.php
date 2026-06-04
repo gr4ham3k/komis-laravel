@@ -10,10 +10,8 @@ use App\Models\Transmission;
 use App\Models\Brand;
 use App\Models\Listing;
 use App\Models\Tag;
-use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class ListingController extends Controller
 {
@@ -67,5 +65,32 @@ class ListingController extends Controller
         $listing->tags()->sync($request->tags ?? []);
 
         return redirect()->route('listings.images.create', $listing->id);
+    }
+
+
+
+    public function search(Request $request)
+    {
+        $query = $request->q;
+
+        $brands = Brand::whereRaw("similarity(name, ?) > 0.2", [$query])
+            ->orderByRaw("similarity(name, ?) DESC", [$query])
+            ->limit(10)
+            ->get();
+
+        return response()->json($brands);
+    }
+
+
+    public function searchModels(Request $request)
+    {
+        $query = $request->q;
+        $brandId = $request->brand_id;
+
+        return CarModel::where('brand_id', $brandId)
+            ->whereRaw("name % ?", [$query])
+            ->orderByRaw("similarity(name, ?) DESC", [$query])
+            ->limit(10)
+            ->get();
     }
 }

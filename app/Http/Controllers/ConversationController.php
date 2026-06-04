@@ -21,32 +21,22 @@ class ConversationController extends Controller
         return redirect()->route('conversations.show', $conversation->id);
     }
 
-    public function show($id)
-    {
-        $conversation = Conversation::with([
-            'messages.sender',
-            'listing'
-        ])->findOrFail($id);
-
-        return view('conversations.show', compact('conversation'));
-    }
-
     public function index()
     {
-        $userId = 2; // do zmiany
-
-        $conversations = Conversation::where('user2_id', $userId)
-            ->orWhereHas('listing', function ($q) use ($userId) {
-                $q->where('user_id', $userId);
-            })
-            ->with([
-                'listing',
-                'messages' => function ($q) {
-                    $q->latest();
-                }
-            ])
+        $conversations = Conversation::with(['messages', 'listing'])
+            ->Where('user2_id', 2)
             ->get();
 
         return view('conversations.index', compact('conversations'));
+    }
+
+    public function show($id)
+    {
+        $conversations = Conversation::with(['messages', 'listing'])->get();
+
+        $conversationActive = Conversation::with(['messages.sender', 'listing'])
+            ->findOrFail($id);
+
+        return view('conversations.index', compact('conversations', 'conversationActive'));
     }
 }

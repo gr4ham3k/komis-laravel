@@ -59,28 +59,23 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label">Marka</label>
-                                    <select name="brand_id" class="form-select" required>
-                                        <option value="">Wybierz markę</option>
+                                    <input type="text" id="brand-search" class="form-control"
+                                        placeholder="Wpisz markę..." autocomplete="off">
 
-                                        @foreach ($brands as $brand)
-                                            <option value="{{ $brand->id }}">
-                                                {{ $brand->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <input type="hidden" name="brand_id" id="brand-id">
+
+                                    <div id="brand-results" class="list-group"></div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label">Model</label>
-                                    <select name="model_id" class="form-select" required>
-                                        <option value="">Wybierz model</option>
 
-                                        @foreach ($models as $model)
-                                            <option value="{{ $model->id }}">
-                                                {{ $model->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <input type="text" id="model-search" class="form-control"
+                                        placeholder="Wpisz model..." autocomplete="off">
+
+                                    <input type="hidden" name="model_id" id="model-id">
+
+                                    <div id="model-results" class="list-group"></div>
                                 </div>
 
                                 <div class="col-md-4">
@@ -218,6 +213,85 @@
 
                     console.log("Wybrane miasto:", city);
                 });
+        });
+    </script>
+
+    <script>
+        const search = document.getElementById('brand-search');
+        const results = document.getElementById('brand-results');
+        const brandId = document.getElementById('brand-id');
+
+        search.addEventListener('input', async () => {
+
+            if (search.value.length < 1) {
+                results.innerHTML = '';
+                return;
+            }
+
+            const response = await fetch(
+                `/brands/search?q=${encodeURIComponent(search.value)}`
+            );
+
+            const brands = await response.json();
+
+            results.innerHTML = '';
+
+            brands.forEach(brand => {
+
+                const item = document.createElement('button');
+
+                item.type = 'button';
+                item.className = 'list-group-item list-group-item-action';
+                item.textContent = brand.name;
+
+                item.onclick = () => {
+                    search.value = brand.name;
+                    brandId.value = brand.id;
+                    results.innerHTML = '';
+                };
+
+                results.appendChild(item);
+            });
+        });
+    </script>
+
+    <script>
+        const modelSearch = document.getElementById('model-search');
+        const modelResults = document.getElementById('model-results');
+        const modelId = document.getElementById('model-id');
+
+        modelSearch.addEventListener('input', async () => {
+
+            if (!brandId.value) return;
+
+            if (modelSearch.value.length < 2) {
+                modelResults.innerHTML = '';
+                return;
+            }
+
+            const response = await fetch(
+                `/models/search?brand_id=${brandId.value}&q=${encodeURIComponent(modelSearch.value)}`
+            );
+
+            const models = await response.json();
+
+            modelResults.innerHTML = '';
+
+            models.forEach(model => {
+
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'list-group-item list-group-item-action';
+                item.textContent = model.name;
+
+                item.onclick = () => {
+                    modelSearch.value = model.name;
+                    modelId.value = model.id;
+                    modelResults.innerHTML = '';
+                };
+
+                modelResults.appendChild(item);
+            });
         });
     </script>
 

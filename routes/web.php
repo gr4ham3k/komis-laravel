@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\Dictionary\BodyTypeController;
 use App\Http\Controllers\Admin\Dictionary\BrandController;
 use App\Http\Controllers\Admin\Dictionary\FuelController;
 use App\Http\Controllers\Admin\Dictionary\ModelController;
+use App\Http\Controllers\Admin\Dictionary\TagController;
 use App\Http\Controllers\Admin\Dictionary\TransmissionController;
 use App\Http\Controllers\Admin\DictionaryController;
 use App\Http\Controllers\Admin\ServiceAdminController;
@@ -25,6 +26,9 @@ Route::get('/listings/{listing}', [ListingController::class, 'show'])->name('lis
 
 Route::get('listings/{listing}/images',[ListingImageController::class,'create'])->name('listings.images.create');
 Route::post('listings/{listing}/images',[ListingImageController::class,'store'])->name('listings.images.store');
+
+Route::get('/brands/search', [ListingController::class, 'search']);
+Route::get('/models/search', [ListingController::class, 'searchModels']);
 
 Route::get('/chat/start/{listingId}', [ConversationController::class, 'createOrOpenConversation'])->name('conversations.start');
 Route::get('/conversations', [ConversationController::class, 'index'])->name('conversations.index');
@@ -64,6 +68,10 @@ Route::prefix('admin/dictionaries')->group(function () {
     Route::post('/body-types',[BodyTypeController::class,'store'])->name('admin.dictionaries.bodies.store');
     Route::delete('/body-types/{id}',[BodyTypeController::class,'destroy'])->name('admin.dictionaries.bodies.destroy');
     Route::patch('/body-types/{id}',[BodyTypeController::class,'update'])->name('admin.dictionaries.bodies.update');
+
+    Route::post('/tags',[TagController::class,'store'])->name('admin.dictionaries.tags.store');
+    Route::delete('/tags/{id}',[TagController::class,'destroy'])->name('admin.dictionaries.tags.destroy');
+    Route::patch('/tags/{id}',[TagController::class,'update'])->name('admin.dictionaries.tags.update');
 
 });
 

@@ -8,10 +8,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            min-height: 100vh;
-            background: linear-gradient(180deg, #f6f7fb 0%, #eef2f7 100%);
-        }
+        html, body {
+    height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, #f6f7fb 0%, #eef2f7 100%);
+}
 
         .navbar-brand {
             font-weight: 700;
@@ -122,7 +128,7 @@
         @yield('content')
     </main>
 
-    <footer class="bg-dark text-white text-center py-3 mt-5">
+   <footer class="bg-dark text-white text-center py-3 mt-auto">
         <div class="container">
             <p class="mb-0">&copy; {{ date('Y') }} MotoKomis - Wszystkie prawa zastrzezone</p>
         </div>

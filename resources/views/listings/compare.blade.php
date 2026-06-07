@@ -19,8 +19,6 @@
             <div>
                 <h1 class="h3 mb-1">Porownanie ogloszen</h1>
                 <p class="text-muted mb-0">
-                    Zielone pola oznaczaja najlepsza wartosc w danym wierszu. Nizsza cena i mniejszy przebieg sa lepsze,
-                    a dla pozostalych parametrów wyzsza wartosc dostaje wyróżnienie.
                 </p>
             </div>
 

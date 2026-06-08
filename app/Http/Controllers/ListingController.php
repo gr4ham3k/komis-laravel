@@ -17,6 +17,15 @@ use Illuminate\Support\Str;
 
 class ListingController extends Controller
 {
+    public function index()
+    {
+        $listings = Listing::with(['brand', 'carModel', 'fuel', 'transmission', 'bodyType', 'images', 'user'])
+            ->latest()
+            ->paginate(12);
+
+        return view('listings.index', compact('listings'));
+    }
+
     public function show(Listing $listing)
     {
         $listing->load('images', 'tags');
@@ -58,7 +67,9 @@ class ListingController extends Controller
             'tags' => 'array'
         ]);
 
-        $validated['user_id'] = Auth::id() ?? 1; //DO ZMIANY JAK BEDA UZYTKOWNICY!!
+        // Local database fallback used before authentication was connected.
+        // $validated['user_id'] = 1;
+        $validated['user_id'] = Auth::id();
         $validated['status'] = 'inactive';
         $validated['views_count'] = 0;
 

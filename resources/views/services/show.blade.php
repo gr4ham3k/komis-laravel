@@ -79,24 +79,30 @@
                     <div class="card-body">
                         <h4>Opinie klientów</h4>
 
-                        <form method="POST" action="{{ route('services.review', $service->id) }}" class="mb-4">
-                            @csrf
-                            <div class="mb-2">
-                                <label class="form-label">Ocena</label>
-                                <select name="rating" class="form-select" required>
-                                    <option value="5">★★★★★ (5)</option>
-                                    <option value="4">★★★★☆ (4)</option>
-                                    <option value="3">★★★☆☆ (3)</option>
-                                    <option value="2">★★☆☆☆ (2)</option>
-                                    <option value="1">★☆☆☆☆ (1)</option>
-                                </select>
+                        @auth
+                            <form method="POST" action="{{ route('services.review', $service->id) }}" class="mb-4">
+                                @csrf
+                                <div class="mb-2">
+                                    <label class="form-label">Ocena</label>
+                                    <select name="rating" class="form-select" required>
+                                        <option value="5">★★★★★ (5)</option>
+                                        <option value="4">★★★★☆ (4)</option>
+                                        <option value="3">★★★☆☆ (3)</option>
+                                        <option value="2">★★☆☆☆ (2)</option>
+                                        <option value="1">★☆☆☆☆ (1)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Komentarz</label>
+                                    <textarea name="comment" class="form-control" rows="3" placeholder="Twoja opinia..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Dodaj opinię</button>
+                            </form>
+                        @else
+                            <div class="alert alert-info mb-4">
+                                <a href="{{ route('login') }}">Zaloguj sie</a>, aby dodac opinie.
                             </div>
-                            <div class="mb-2">
-                                <label class="form-label">Komentarz</label>
-                                <textarea name="comment" class="form-control" rows="3" placeholder="Twoja opinia..."></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Dodaj opinię</button>
-                        </form>
+                        @endauth
                         <hr>
 
                         @forelse($service->reviews as $review)

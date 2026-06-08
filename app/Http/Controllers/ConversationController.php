@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Listing;
 use App\Models\Conversation;
+use Illuminate\Support\Facades\Auth;
 
 class ConversationController extends Controller
 {
@@ -15,7 +16,7 @@ class ConversationController extends Controller
 
         $conversation = Conversation::firstOrCreate([
             'listing_id' => $listingId,
-            'user2_id' => 2, //do zmiany
+            'user2_id' => Auth::id(),
         ]);
 
         return redirect()->route('conversations.show', $conversation->id);
@@ -23,8 +24,20 @@ class ConversationController extends Controller
 
     public function index()
     {
-        $conversations = Conversation::with(['messages', 'listing'])
-            ->Where('user2_id', 2)
+         $userId = Auth::id();
+        $conversations = Conversation::with(['messages', 'listing'])->Where('user2_id', $userId);
+
+
+        $conversations = Conversation::where('user2_id', $userId)
+            ->orWhereHas('listing', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->with([
+                'listing',
+                'messages' => function ($q) {
+                    $q->latest();
+                }
+            ])
             ->get();
 
         return view('conversations.index', compact('conversations'));

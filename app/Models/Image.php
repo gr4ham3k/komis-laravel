@@ -16,4 +16,9 @@ class Image extends Model
     {
         return $this -> belongsToMany(Listing::class, 'listing_images') -> withPivot('sort_order');
     }
+
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'service_images')->withPivot('sort_order');
+    }
 }

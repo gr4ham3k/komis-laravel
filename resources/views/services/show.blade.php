@@ -14,6 +14,41 @@
     <div class="container my-4">
         <div class="row">
             <div class="col-md-8">
+                @if ($service->images->isNotEmpty())
+                    <div id="serviceCarousel" class="carousel slide mb-3" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            @foreach ($service->images as $index => $image)
+                                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                    <img src="{{ asset('storage/services/' . $image->file_name) }}" class="d-block w-100"
+                                        style="height: 450px; object-fit: cover; border-radius: 6px;">
+                                </div>
+                            @endforeach
+                        </div>
+                        @if ($service->images->count() > 1)
+                            <button class="carousel-control-prev" type="button" data-bs-target="#serviceCarousel"
+                                data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Poprzednie</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#serviceCarousel"
+                                data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Następne</span>
+                            </button>
+                        @endif
+                    </div>
+                @else
+                    @auth
+                        @if(Auth::id() === $service->user_id)
+                            <div class="mb-3 text-start">
+                                <a href="{{ route('services.edit', $service->id) }}" class="btn btn-primary">
+                                    ➕ Dodaj zdjęcia
+                                </a>
+                            </div>
+                        @endif
+                    @endauth
+                @endif
+
                 <!-- Service Details -->
                 <div class="card mb-3">
                     <div class="card-body">
@@ -133,12 +168,19 @@
                         <h3 class="text-success mb-1">{{ number_format($service->price, 2) }} PLN</h3>
                         <hr>
                         <div class="d-grid gap-2">
-                            <button class="btn btn-primary"
-                                onclick="window.location.href='mailto:{{ $service->user->email }}'">
-                                <i class="fas fa-envelope"></i> Napisz do usługodawcy
-                            </button>
+                            <form method="get" action="{{ route('conversations.start.service', $service->id) }}">
+                                @csrf
+                                <button class="btn btn-primary w-100">
+                                    <i class="fas fa-envelope"></i> Napisz do usługodawcy
+                                </button>
+                            </form>
 
                             @auth
+                                @if(Auth::id() === $service->user_id)
+                                    <a href="{{ route('services.edit', $service->id) }}" class="btn btn-warning text-white">
+                                        <i class="fas fa-edit"></i> Edytuj usługę
+                                    </a>
+                                @endif
                                 @if(Auth::user()->is_admin)
                                     <a href="{{ route('admin.services.index') }}" class="btn btn-outline-secondary">
                                         <i class="fas fa-gear"></i> Zarządzaj w panelu admina

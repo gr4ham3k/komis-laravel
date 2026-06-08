@@ -38,4 +38,16 @@ class Service extends Model
     {
         return $this->reviews()->avg('rating') ?? 0;
     }
+
+    public function images()
+    {
+        return $this->belongsToMany(Image::class, 'service_images')
+            ->withPivot('sort_order')
+            ->orderBy('service_images.sort_order');
+    }
+
+    public function conversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class);
+    }
 }

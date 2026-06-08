@@ -139,8 +139,12 @@
     <div class="d-flex flex-column gap-2">
         @forelse($services as $service)
             <a href="{{ route('services.show', $service->id) }}" class="service-offer">
-                <div class="service-thumb">
-                    <i class="fas fa-screwdriver-wrench"></i>
+                <div class="service-thumb" style="padding: 0; overflow: hidden;">
+                    @if ($service->images->isNotEmpty())
+                        <img src="{{ asset('storage/services/' . $service->images->first()->file_name) }}" alt="{{ $service->title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    @else
+                        <i class="fas fa-screwdriver-wrench"></i>
+                    @endif
                 </div>
 
                 <div>

@@ -11,11 +11,15 @@
 
 <div class="container py-4">
 
+    @php
+        $subject = $conversation->listing ?? $conversation->service;
+    @endphp
+
     <div class="card shadow-sm">
 
         <div class="card-header bg-white">
             <h5 class="mb-0">
-                {{ $conversation->listing->title }}
+                {{ $subject?->title ?? 'Rozmowa bez przypisanego ogłoszenia lub usługi' }}
             </h5>
 
             <small class="text-muted">

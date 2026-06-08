@@ -27,6 +27,7 @@ Route::get('listings/{listing}/images',[ListingImageController::class,'create'])
 Route::post('listings/{listing}/images',[ListingImageController::class,'store'])->name('listings.images.store');
 
 Route::get('/chat/start/{listingId}', [ConversationController::class, 'createOrOpenConversation'])->name('conversations.start');
+Route::get('/chat/start/service/{serviceId}', [ConversationController::class, 'createOrOpenServiceConversation'])->name('conversations.start.service');
 Route::get('/conversations', [ConversationController::class, 'index'])->name('conversations.index');
 Route::get('/conversations/{id}', [ConversationController::class, 'show'])->name('conversations.show');
 

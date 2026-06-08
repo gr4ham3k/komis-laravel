@@ -16,7 +16,7 @@
                     <h3>Dodaj nową usługę</h3>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ route('services.store') }}">
+                    <form method="POST" action="{{ route('services.store') }}" enctype="multipart/form-data">
                         @csrf
                         
                         <div class="mb-3">
@@ -51,6 +51,16 @@
                             <input type="text" name="city" class="form-control @error('city') is-invalid @enderror" 
                                    value="{{ old('city') }}" required>
                             @error('city')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Zdjęcia usługi</label>
+                            <input type="file" name="images[]" class="form-control @error('images.*') is-invalid @enderror" 
+                                   multiple accept="image/*">
+                            <small class="text-muted">Możesz wybrać kilka zdjęć jednocześnie (JPG, PNG, WEBP).</small>
+                            @error('images.*')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

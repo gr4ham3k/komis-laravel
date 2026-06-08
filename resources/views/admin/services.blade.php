@@ -168,8 +168,14 @@
                         <tr>
                             <td>
                                 <div class="service-info-cell">
-                                    <div class="service-thumb-small">
-                                        <i class="fas fa-screwdriver-wrench"></i>
+                                    <div class="service-thumb-small" style="padding: 0; overflow: hidden;">
+                                        @if($service->images->isNotEmpty())
+                                            <img src="{{ asset('storage/services/' . $service->images->first()->file_name) }}" 
+                                                 alt="{{ $service->title }}" 
+                                                 style="width: 100%; height: 100%; object-fit: cover;">
+                                        @else
+                                            <i class="fas fa-screwdriver-wrench"></i>
+                                        @endif
                                     </div>
                                     <div>
                                         <div class="service-title">{{ $service->title }}</div>

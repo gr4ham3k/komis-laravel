@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Service;
 use App\Models\ServiceReview;
+use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ServiceController extends Controller
 {
@@ -14,7 +17,7 @@ class ServiceController extends Controller
     {
         $search = trim((string) $request->query('search'));
 
-        $services = Service::with('user', 'reviews')
+        $services = Service::with('user', 'reviews', 'images')
             ->where('status', 'active')
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
@@ -32,7 +35,7 @@ class ServiceController extends Controller
 
     public function show($id)
     {
-        $service = Service::with('user', 'reviews.user')
+        $service = Service::with('user', 'reviews.user', 'images')
             ->findOrFail($id);
         
         // Increment views count
@@ -52,17 +55,35 @@ class ServiceController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
-            'city' => 'required|string|max:255'
+            'city' => 'required|string|max:255',
+            'images.*' => 'nullable|image|max:2048'
         ]);
 
         $service = Service::create([
-            'user_id' => Auth::id(),
+            'user_id' => Auth::id() ?? 1,
             'title' => $validated['title'],
             'description' => $validated['description'],
             'price' => $validated['price'],
             'city' => $validated['city'],
             'status' => 'active'
         ]);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $imageFile) {
+                $uuid = (string) Str::uuid();
+                $extension = $imageFile->getClientOriginalExtension();
+                $fileName = $uuid . '.' . $extension;
+                $imageFile->storeAs('services', $fileName, 'public');
+
+                $image = Image::create([
+                    'file_name' => $fileName,
+                    'original_name' => $imageFile->getClientOriginalName(),
+                    'file_type' => $imageFile->getClientMimeType(),
+                ]);
+
+                $service->images()->attach($image->id);
+            }
+        }
 
         return redirect()->route('services.show', $service->id)
             ->with('success', 'Usługa została dodana!');
@@ -82,10 +103,53 @@ class ServiceController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
-            'city' => 'required|string|max:255'
+            'city' => 'required|string|max:255',
+            'images.*' => 'nullable|image|max:2048',
+            'delete_images' => 'nullable|array',
+            'delete_images.*' => 'exists:images,id'
         ]);
 
-        $service->update($validated);
+        $service->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'city' => $validated['city']
+        ]);
+
+        // Handle deleting selected images
+        if (!empty($validated['delete_images'])) {
+            foreach ($validated['delete_images'] as $imageId) {
+                $image = Image::find($imageId);
+                if ($image) {
+                    // Detach from this service
+                    $service->images()->detach($imageId);
+                    
+                    // Check if it's still linked anywhere
+                    if (!$image->listings()->exists() && !$image->services()->exists()) {
+                        Storage::disk('public')->delete('services/' . $image->file_name);
+                        $image->delete();
+                    }
+                }
+            }
+        }
+
+        // Handle adding new images
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $imageFile) {
+                $uuid = (string) Str::uuid();
+                $extension = $imageFile->getClientOriginalExtension();
+                $fileName = $uuid . '.' . $extension;
+                $imageFile->storeAs('services', $fileName, 'public');
+
+                $image = Image::create([
+                    'file_name' => $fileName,
+                    'original_name' => $imageFile->getClientOriginalName(),
+                    'file_type' => $imageFile->getClientMimeType(),
+                ]);
+
+                $service->images()->attach($image->id);
+            }
+        }
 
         return redirect()->route('services.show', $service->id)
             ->with('success', 'Usługa została zaktualizowana!');

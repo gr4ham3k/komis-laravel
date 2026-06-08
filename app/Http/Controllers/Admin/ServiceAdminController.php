@@ -11,7 +11,7 @@ class ServiceAdminController extends Controller
 {
     public function index()
     {
-        $services = Service::with('user')
+        $services = Service::with('user', 'images')
             ->latest()
             ->paginate(15);
         $users = User::orderBy('name')->get();

@@ -20,6 +20,7 @@
 
                 @php
                     $lastMessage = $conversation->messages->first();
+                    $subject = $conversation->listing ?? $conversation->service;
                 @endphp
 
                 <a href="{{ route('conversations.show', $conversation->id) }}"
@@ -29,7 +30,7 @@
 
                         <div>
                             <strong>
-                                {{ $conversation->listing->title }}
+                                {{ $subject?->title ?? 'Rozmowa bez przypisanego ogłoszenia lub usługi' }}
                             </strong>
 
                             <div class="text-muted small">

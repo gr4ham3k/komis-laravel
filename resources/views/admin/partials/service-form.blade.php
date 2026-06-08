@@ -44,4 +44,18 @@
         <label class="form-label">Opis</label>
         <textarea name="description" class="form-control" rows="5" required>{{ old('description', $service->description ?? '') }}</textarea>
     </div>
+
+    @if(isset($service) && $service->images->isNotEmpty())
+        <div class="col-12">
+            <label class="form-label d-block">Zdjęcia usługi</label>
+            <div class="d-flex flex-wrap gap-2">
+                @foreach($service->images as $image)
+                    <img src="{{ asset('storage/services/' . $image->file_name) }}" 
+                         alt="Zdjęcie usługi" 
+                         class="img-thumbnail" 
+                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px;">
+                @endforeach
+            </div>
+        </div>
+    @endif
 </div>

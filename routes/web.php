@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\Dictionary\BodyTypeController;
 use App\Http\Controllers\Admin\Dictionary\BrandController;
 use App\Http\Controllers\Admin\Dictionary\FuelController;
 use App\Http\Controllers\Admin\Dictionary\ModelController;
+use App\Http\Controllers\Admin\Dictionary\TagController;
 use App\Http\Controllers\Admin\Dictionary\TransmissionController;
 use App\Http\Controllers\Admin\DictionaryController;
 use App\Http\Controllers\Admin\ServiceAdminController;
@@ -31,6 +32,23 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
 Route::get('/listings', [ListingController::class, 'index'])->name('listings.index');
+Route::get('/listings/create', [ListingController::class, 'create'])->name('listings.create');
+Route::post('/listings/create',[ListingController::class,'store'])->name('listings.store');
+Route::get('/listings/{listing}', [ListingController::class, 'show'])->name('listings.show');
+
+Route::get('listings/{listing}/images',[ListingImageController::class,'create'])->name('listings.images.create');
+Route::post('listings/{listing}/images',[ListingImageController::class,'store'])->name('listings.images.store');
+
+Route::get('/brands/search', [ListingController::class, 'search']);
+Route::get('/models/search', [ListingController::class, 'searchModels']);
+
+Route::get('/chat/start/{listingId}', [ConversationController::class, 'createOrOpenConversation'])->name('conversations.start');
+Route::get('/conversations', [ConversationController::class, 'index'])->name('conversations.index');
+Route::get('/conversations/{id}', [ConversationController::class, 'show'])->name('conversations.show');
+
+Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+Route::get('/conversations/{id}/messages', [MessageController::class, 'index']);
+
 Route::get('/listings/{listing}', [ListingController::class, 'show'])
     ->whereNumber('listing')
     ->name('listings.show');
@@ -38,6 +56,10 @@ Route::get('/services', [ServiceController::class, 'index'])->name('services.ind
 Route::get('/services/{id}', [ServiceController::class, 'show'])
     ->whereNumber('id')
     ->name('services.show');
+
+    Route::post('/tags',[TagController::class,'store'])->name('admin.dictionaries.tags.store');
+    Route::delete('/tags/{id}',[TagController::class,'destroy'])->name('admin.dictionaries.tags.destroy');
+    Route::patch('/tags/{id}',[TagController::class,'update'])->name('admin.dictionaries.tags.update');
 
 Route::prefix('compare')->name('compare.')->group(function () {
     Route::get('/', [ListingCompareController::class, 'index'])->name('index');

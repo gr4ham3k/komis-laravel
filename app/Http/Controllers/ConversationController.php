@@ -22,19 +22,11 @@ class ConversationController extends Controller
         return redirect()->route('conversations.show', $conversation->id);
     }
 
-    public function show($id)
-    {
-        $conversation = Conversation::with([
-            'messages.sender',
-            'listing'
-        ])->findOrFail($id);
-
-        return view('conversations.show', compact('conversation'));
-    }
-
     public function index()
     {
-        $userId = Auth::id();
+         $userId = Auth::id();
+        $conversations = Conversation::with(['messages', 'listing'])->Where('user2_id', $userId);
+
 
         $conversations = Conversation::where('user2_id', $userId)
             ->orWhereHas('listing', function ($q) use ($userId) {
@@ -49,5 +41,15 @@ class ConversationController extends Controller
             ->get();
 
         return view('conversations.index', compact('conversations'));
+    }
+
+    public function show($id)
+    {
+        $conversations = Conversation::with(['messages', 'listing'])->get();
+
+        $conversationActive = Conversation::with(['messages.sender', 'listing'])
+            ->findOrFail($id);
+
+        return view('conversations.index', compact('conversations', 'conversationActive'));
     }
 }

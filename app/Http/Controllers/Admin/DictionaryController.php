@@ -7,6 +7,7 @@ use App\Models\BodyType;
 use App\Models\Brand;
 use App\Models\CarModel;
 use App\Models\Fuel;
+use App\Models\Tag;
 use App\Models\Transmission;
 
 class DictionaryController extends Controller
@@ -18,8 +19,9 @@ class DictionaryController extends Controller
         $fuels = Fuel::all();
         $transmissions = Transmission::all();
         $bodyTypes = BodyType::all();
+        $tags = Tag::all();
 
-        return view('admin.dictionaries',compact('brands','models','fuels','transmissions','bodyTypes'));
+        return view('admin.dictionaries',compact('brands','models','fuels','transmissions','bodyTypes','tags'));
     }
 
 

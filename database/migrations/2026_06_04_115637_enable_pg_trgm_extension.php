@@ -12,11 +12,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement('CREATE EXTENSION IF NOT EXISTS pg_trgm');
+        // Wykonaj tylko dla PostgreSQL i poza środowiskiem testowym
+        if (DB::connection()->getDriverName() === 'pgsql' && !app()->environment('testing')) {
+            DB::statement('CREATE EXTENSION IF NOT EXISTS pg_trgm');
+        }
     }
 
     public function down(): void
     {
-        DB::statement('DROP EXTENSION IF EXISTS pg_trgm');
+        // Wykonaj tylko dla PostgreSQL i poza środowiskiem testowym
+        if (DB::connection()->getDriverName() === 'pgsql' && !app()->environment('testing')) {
+            DB::statement('DROP EXTENSION IF EXISTS pg_trgm');
+        }
     }
 };

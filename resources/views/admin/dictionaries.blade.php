@@ -1,39 +1,28 @@
-<!DOCTYPE html>
-<html lang="pl">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <title>Słowniki - Admin</title>
+@push('styles')
+<style>
+    body { background: #f8f9fa; }
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    .tab-content {
+        background: #fff;
+        padding: 20px;
+        border: 1px solid #dee2e6;
+        border-top: none;
+    }
 
-    <style>
-        body {
-            background: #f8f9fa;
-        }
+    .dictionary-item { gap: 12px; }
+    .dictionary-actions { flex-shrink: 0; }
 
-        .tab-content {
-            background: #fff;
-            padding: 20px;
-            border: 1px solid #dee2e6;
-            border-top: none;
-        }
+    .dictionary-edit {
+        border-top: 1px solid #dee2e6;
+        margin-top: 12px;
+        padding-top: 12px;
+    }
+</style>
+@endpush
 
-        .dictionary-item {
-            gap: 12px;
-        }
-
-        .dictionary-actions {
-            flex-shrink: 0;
-        }
-
-        .dictionary-edit {
-            border-top: 1px solid #dee2e6;
-            margin-top: 12px;
-            padding-top: 12px;
-        }
-    </style>
-</head>
+@section('content')
 
 <body>
 
@@ -411,8 +400,4 @@
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-
-</html>
+@endsection

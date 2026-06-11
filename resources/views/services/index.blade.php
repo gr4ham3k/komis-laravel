@@ -15,6 +15,9 @@
             </div>
 
             <div class="d-flex gap-2">
+                <a href="{{ route('services.create') }}" class="btn btn-success">
+                    <i class="fas fa-plus me-1"></i>Dodaj usługę
+                </a>
                 <a href="{{ route('home') }}" class="btn btn-outline-secondary">Powrót</a>
             </div>
         </div>

@@ -1,14 +1,6 @@
-<!DOCTYPE html>
-<html lang="pl">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <title>Czat</title>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+@push('styles')
     <style>
         body {
             font-size: 16px;
@@ -25,130 +17,119 @@
             font-size: 15px;
         }
     </style>
-</head>
+@endpush
 
-<body>
+@section('content')
 
-<div class="container-fluid py-3">
+    <div class="container-fluid py-3">
 
-    <div class="row">
+        <div class="row">
 
-        <!-- LEWA STRONA (rozmowy) -->
-        <div class="col-4 border-end bg-white" style="height: 90vh; overflow-y: auto;">
+            <!-- LEWA STRONA (rozmowy) -->
+            <div class="col-4 border-end bg-white" style="height: 90vh; overflow-y: auto;">
 
-            <h5 class="mb-3 p-3">Rozmowy</h5>
+                <h5 class="mb-3 p-3">Rozmowy</h5>
 
-            @foreach ($conversations as $conversation)
+                @foreach ($conversations as $conversation)
+                    @php
+                        $lastMessage = $conversation->messages->first();
+                    @endphp
 
-                @php
-                    $lastMessage = $conversation->messages->first();
-                @endphp
+                    <a href="{{ route('conversations.show', $conversation->id) }}" class="text-decoration-none text-dark">
 
-                <a href="{{ route('conversations.show', $conversation->id) }}"
-                   class="text-decoration-none text-dark">
+                        <div class="p-3 mb-2 rounded hover-bg">
 
-                    <div class="p-3 mb-2 rounded hover-bg">
+                            <strong style="font-size: 16px;">
+                                {{ $conversation->listing->title }}
+                            </strong>
 
-                        <strong style="font-size: 16px;">
-                            {{ $conversation->listing->title }}
-                        </strong>
-
-                        <div class="text-muted" style="font-size: 14px;">
-                            {{ $lastMessage?->content ?? 'Brak wiadomości' }}
-                        </div>
-
-                    </div>
-
-                </a>
-
-            @endforeach
-
-        </div>
-
-        <!-- PRAWA STRONA (czat) -->
-        <div class="col-8 d-flex flex-column" style="height: 90vh;">
-
-            @if (isset($conversationActive))
-
-                <!-- HEADER -->
-                <div class="border-bottom p-3 bg-white">
-                    <h5 class="mb-0">
-                        {{ $conversationActive->listing->title }}
-                    </h5>
-                </div>
-
-                <!-- WIADOMOŚCI -->
-                <div class="flex-grow-1 p-3 overflow-auto" id="chat-box" style="background: #f8f9fa;">
-
-                    @foreach ($conversationActive->messages as $message)
-
-                        <div class="d-flex mb-3
-                            {{ $message->sender_id == auth()->id() ? 'justify-content-end' : 'justify-content-start' }}">
-
-                            <div class="p-2 rounded chat-message
-                                {{ $message->sender_id == auth()->id()
-                                    ? 'bg-primary text-white'
-                                    : 'bg-white border shadow-sm' }}">
-
-                                <div style="font-size: 13px; opacity: 0.8;">
-                                    {{ $message->sender->name }}
-                                </div>
-
-                                <div style="font-size: 16px;">
-                                    {{ $message->content }}
-                                </div>
-
-                                <div class="text-end" style="font-size: 12px; opacity: 0.7;">
-                                    {{ $message->created_at->format('H:i') }}
-                                </div>
-
+                            <div class="text-muted" style="font-size: 14px;">
+                                {{ $lastMessage?->content ?? 'Brak wiadomości' }}
                             </div>
 
                         </div>
 
-                    @endforeach
+                    </a>
+                @endforeach
 
-                </div>
+            </div>
 
-                <!-- INPUT -->
-                <div class="border-top p-3 bg-white">
+            <!-- PRAWA STRONA (czat) -->
+            <div class="col-8 d-flex flex-column" style="height: 90vh;">
 
-                    <form method="POST" action="{{ route('messages.store') }}">
-                        @csrf
+                @if (isset($conversationActive))
 
-                        <input type="hidden" name="conversation_id" value="{{ $conversationActive->id }}">
+                    <!-- HEADER -->
+                    <div class="border-bottom p-3 bg-white">
+                        <h5 class="mb-0">
+                            {{ $conversationActive->listing->title }}
+                        </h5>
+                    </div>
 
-                        <div class="input-group">
+                    <!-- WIADOMOŚCI -->
+                    <div class="flex-grow-1 p-3 overflow-auto" id="chat-box" style="background: #f8f9fa;">
 
-                            <input type="text"
-                                   name="content"
-                                   class="form-control form-control-lg"
-                                   placeholder="Napisz wiadomość..."
-                                   required>
+                        @foreach ($conversationActive->messages as $message)
+                            <div
+                                class="d-flex mb-3
+                            {{ $message->sender_id == auth()->id() ? 'justify-content-end' : 'justify-content-start' }}">
 
-                            <button class="btn btn-primary btn-lg">
-                                Wyślij
-                            </button>
+                                <div
+                                    class="p-2 rounded chat-message text-break
+                                {{ $message->sender_id == auth()->id() ? 'bg-primary text-white' : 'bg-white border shadow-sm' }}">
 
-                        </div>
+                                    <div style="font-size: 13px; opacity: 0.8;">
+                                        {{ $message->sender->name }}
+                                    </div>
 
-                    </form>
+                                    <div style="font-size: 16px;">
+                                        {{ $message->content }}
+                                    </div>
 
-                </div>
+                                    <div class="text-end" style="font-size: 12px; opacity: 0.7;">
+                                        {{ $message->created_at->format('H:i') }}
+                                    </div>
 
-            @else
+                                </div>
 
-                <div class="d-flex align-items-center justify-content-center flex-grow-1 text-muted">
-                    Wybierz rozmowę
-                </div>
+                            </div>
+                        @endforeach
 
-            @endif
+                    </div>
+
+                    <!-- INPUT -->
+                    <div class="border-top p-3 bg-white">
+
+                        <form method="POST" action="{{ route('messages.store') }}">
+                            @csrf
+
+                            <input type="hidden" name="conversation_id" value="{{ $conversationActive->id }}">
+
+                            <div class="input-group">
+
+                                <input type="text" name="content" class="form-control form-control-lg"
+                                    placeholder="Napisz wiadomość..." required>
+
+                                <button class="btn btn-primary btn-lg">
+                                    Wyślij
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+                @else
+                    <div class="d-flex align-items-center justify-content-center flex-grow-1 text-muted">
+                        Wybierz rozmowę
+                    </div>
+
+                @endif
+
+            </div>
 
         </div>
 
     </div>
 
-</div>
-
-</body>
-</html>
+@endsection

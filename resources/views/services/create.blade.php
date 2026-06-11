@@ -1,25 +1,26 @@
 {{-- resources/views/services/create.blade.php --}}
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dodaj usługę</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-</head>
-<body class="bg-light">
+@extends('layouts.app')
 
+@push('styles')
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+@endpush
+
+@section('content')
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
-                    <h2 class="mb-4">Dodaj nową usługę</h2>
-                    
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="mb-0">Dodaj nową usługę</h2>
+                        <a href="{{ route('services.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Powrót
+                        </a>
+                    </div>
+
                     <form method="POST" action="{{ route('services.store') }}">
                         @csrf
-                        
+
                         <div class="row g-3">
                             <div class="col-12">
                                 <label class="form-label">Tytuł usługi</label>
@@ -29,16 +30,16 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            
+
                             <div class="col-12">
                                 <label class="form-label">Opis</label>
-                                <textarea name="description" class="form-control @error('description') is-invalid @enderror" 
-                                          rows="5" required>{{ old('description') }}</textarea>
+                                <textarea name="description" rows="5" class="form-control @error('description') is-invalid @enderror" 
+                                          required>{{ old('description') }}</textarea>
                                 @error('description')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            
+
                             <div class="col-md-6">
                                 <label class="form-label">Cena (PLN)</label>
                                 <input type="number" step="0.01" name="price" class="form-control @error('price') is-invalid @enderror" 
@@ -47,23 +48,23 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            
+
                             <div class="col-12 mb-3">
                                 <label class="form-label">Wybierz lokalizację</label>
                                 <div id="map" style="height: 350px; border-radius: 10px;"></div>
                                 <input type="hidden" name="city" id="city" value="{{ old('city') }}">
-                                
+                                <small class="text-muted">Kliknij na mapie aby wybrać miasto</small>
                                 @error('city')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
-                            
+
                             <div class="col-12 mt-4">
                                 <button type="submit" class="btn btn-primary px-4">
-                                    Dodaj usługę
+                                    <i class="fas fa-save me-1"></i>Dodaj usługę
                                 </button>
                                 <a href="{{ route('services.index') }}" class="btn btn-outline-secondary px-4 ms-2">
-                                    Anuluj
+                                    <i class="fas fa-times me-1"></i>Anuluj
                                 </a>
                             </div>
                         </div>
@@ -73,13 +74,13 @@
         </div>
     </div>
 </div>
+@endsection
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+@push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-    // Inicjalizacja mapy - dokładnie tak samo jak w ogłoszeniach
-    const map = L.map('map').setView([50.0413, 21.9990], 6);
+    // Inicjalizacja mapy - tak jak w oryginalnej wersji
+    const map = L.map('map').setView([52.237049, 21.017532], 12);
     
     // Dodanie warstwy mapy - identyczna konfiguracja
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -113,6 +114,4 @@
             });
     });
 </script>
-
-</body>
-</html>
+@endpush

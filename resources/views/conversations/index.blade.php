@@ -40,7 +40,7 @@
                         <div class="p-3 mb-2 rounded hover-bg">
 
                             <strong style="font-size: 16px;">
-                                {{ $conversation->listing->title }}
+                                {{ $conversation->listing ? $conversation->listing->title : $conversation->service->title }}
                             </strong>
 
                             <div class="text-muted" style="font-size: 14px;">
@@ -62,7 +62,7 @@
                     <!-- HEADER -->
                     <div class="border-bottom p-3 bg-white">
                         <h5 class="mb-0">
-                            {{ $conversationActive->listing->title }}
+                            {{ $conversationActive->listing ? $conversationActive->listing->title : $conversationActive->service->title }}
                         </h5>
                     </div>
 

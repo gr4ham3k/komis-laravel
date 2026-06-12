@@ -43,4 +43,11 @@ class Service extends Model
     {
         return $this->hasMany(Conversation::class);
     }
+
+    public function images()
+    {
+        return $this->belongsToMany(Image::class, 'service_images')
+            ->withPivot('sort_order')
+            ->orderBy('service_images.sort_order');
+    }
 }

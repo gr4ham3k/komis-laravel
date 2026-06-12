@@ -67,13 +67,22 @@
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 shadow-sm border-0">
                         <!-- Ikona/obrazek usługi -->
-                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 220px;">
-                            @if($service->icon ?? false)
-                                <i class="{{ $service->icon }} fa-4x text-secondary"></i>
-                            @else
-                                <i class="fas fa-screwdriver-wrench fa-4x text-secondary"></i>
-                            @endif
-                        </div>
+                        @if($service->images->first())
+                            <img
+                                src="{{ asset('storage/services/' . $service->images->first()->file_name) }}"
+                                class="card-img-top"
+                                style="height: 220px; object-fit: cover;"
+                                alt="{{ $service->title }}"
+                            >
+                        @else
+                            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 220px;">
+                                @if($service->icon ?? false)
+                                    <i class="{{ $service->icon }} fa-4x text-secondary"></i>
+                                @else
+                                    <i class="fas fa-screwdriver-wrench fa-4x text-secondary"></i>
+                                @endif
+                            </div>
+                        @endif
 
                         <div class="card-body d-flex flex-column">
                             <div class="mb-2">

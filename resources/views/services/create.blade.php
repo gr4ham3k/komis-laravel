@@ -18,7 +18,7 @@
                         </a>
                     </div>
 
-                    <form method="POST" action="{{ route('services.store') }}">
+                    <form method="POST" action="{{ route('services.store') }}" enctype="multipart/form-data">
                         @csrf
 
                         <div class="row g-3">
@@ -46,6 +46,19 @@
                                        value="{{ old('price') }}" required>
                                 @error('price')
                                     <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Dodaj zdjęcia</label>
+                                <input type="file" name="images[]" class="form-control @error('images') is-invalid @enderror @error('images.*') is-invalid @enderror" 
+                                       multiple accept="image/*">
+                                <small class="text-muted">Możesz wybrać kilka zdjęć (maks. 2MB każde)</small>
+                                @error('images')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                                @error('images.*')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
 

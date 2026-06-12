@@ -18,7 +18,10 @@ class BrandController extends Controller
             'name' => $request->name
         ]);
 
-        return back();
+       return redirect()
+            ->back()
+            ->with('activeTab', 'brands')
+            ->with('success', 'Dodano markę');
     }
 
     public function update(Request $request, $id)
@@ -33,7 +36,10 @@ class BrandController extends Controller
             'name' => $request -> name
         ]);
 
-        return back();
+        return redirect()
+            ->back()
+            ->with('activeTab', 'brands')
+            ->with('success', 'Zmodyfikowano markę');
     }
 
     public function destroy($id)
@@ -42,6 +48,9 @@ class BrandController extends Controller
 
         $brand -> delete();
 
-        return back();
+        return redirect()
+            ->back()
+            ->with('activeTab', 'brands')
+            ->with('success', 'Usunięto markę');
     }
 }

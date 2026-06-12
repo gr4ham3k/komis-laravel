@@ -19,6 +19,16 @@
 
                             <h2 class="mb-4">Dodaj ogłoszenie</h2>
 
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
                             <form method="POST" action="" enctype="multipart/form-data">
                                 @csrf
 
@@ -26,57 +36,98 @@
 
                                     <div class="col-12">
                                         <label class="form-label">Tytuł ogłoszenia</label>
-                                        <input type="text" name="title" class="form-control"
+                                        <input type="text" name="title"
+                                            class="form-control @error('title') is-invalid @enderror"
                                             value="{{ old('title') }}" required>
+
+                                        @error('title')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-12">
                                         <label class="form-label">Opis</label>
-                                        <textarea name="description" rows="5" class="form-control" required>{{ old('description') }}</textarea>
+                                        <textarea name="description" rows="5" class="form-control @error('description') is-invalid @enderror" required>{{ old('description') }}</textarea>
+
+                                        @error('description')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Cena</label>
-                                        <input type="number" step="0.01" name="price" class="form-control"
+                                        <input type="number" step="0.01" name="price"
+                                            class="form-control @error('price') is-invalid @enderror"
                                             value="{{ old('price') }}" required>
+
+                                        @error('price')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Rok produkcji</label>
-                                        <input type="number" name="year" class="form-control"
+                                        <input type="number" name="year"
+                                            class="form-control @error('year') is-invalid @enderror"
                                             value="{{ old('year') }}" required>
+
+                                        @error('year')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Kolor</label>
-                                        <input type="text" name="color" class="form-control"
+                                        <input type="text" name="color"
+                                            class="form-control @error('color') is-invalid @enderror"
                                             value="{{ old('color') }}" required>
+
+                                        @error('color')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-6">
                                         <label class="form-label">Marka</label>
-                                        <input type="text" id="brand-search" class="form-control"
+                                        <input type="text" id="brand-search"
+                                            class="form-control @error('brand_id') is-invalid @enderror"
                                             placeholder="Wpisz markę..." autocomplete="off">
 
                                         <input type="hidden" name="brand_id" id="brand-id">
 
                                         <div id="brand-results" class="list-group"></div>
+
+                                        @error('brand_id')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+
+
                                     </div>
 
                                     <div class="col-md-6">
                                         <label class="form-label">Model</label>
 
-                                        <input type="text" id="model-search" class="form-control"
+                                        <input type="text" id="model-search"
+                                            class="form-control @error('model_id') is-invalid @enderror"
                                             placeholder="Wpisz model..." autocomplete="off">
 
                                         <input type="hidden" name="model_id" id="model-id">
 
                                         <div id="model-results" class="list-group"></div>
+
+                                        @error('model_id')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+
+
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Paliwo</label>
-                                        <select name="fuel_id" class="form-select" required>
+                                        <select name="fuel_id" class="form-select @error('fuel_id') is-invalid @enderror"
+                                            required>
                                             <option value="">Wybierz paliwo</option>
 
                                             @foreach ($fuels as $fuel)
@@ -85,11 +136,15 @@
                                                 </option>
                                             @endforeach
                                         </select>
+                                        @error('fuel_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Skrzynia biegów</label>
-                                        <select name="transmission_id" class="form-select" required>
+                                        <select name="transmission_id"
+                                            class="form-select @error('transmission_id') is-invalid @enderror" required>
                                             <option value="">Wybierz skrzynię</option>
 
                                             @foreach ($transmissions as $transmission)
@@ -98,11 +153,15 @@
                                                 </option>
                                             @endforeach
                                         </select>
+                                        @error('transmission_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Typ nadwozia</label>
-                                        <select name="body_type_id" class="form-select" required>
+                                        <select name="body_type_id"
+                                            class="form-select @error('body_type_id') is-invalid @enderror" required>
                                             <option value="">Wybierz nadwozie</option>
 
                                             @foreach ($bodyTypes as $bodyType)
@@ -111,24 +170,42 @@
                                                 </option>
                                             @endforeach
                                         </select>
+                                        @error('body_type_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Przebieg (km)</label>
-                                        <input type="number" name="mileage" class="form-control"
+                                        <input type="number" name="mileage"
+                                            class="form-control @error('mileage') is-invalid @enderror"
                                             value="{{ old('mileage') }}" required>
+
+                                        @error('mileage')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Pojemność silnika (cm³)</label>
-                                        <input type="number" name="engine_capacity" class="form-control"
+                                        <input type="number" name="engine_capacity"
+                                            class="form-control @error('engine_capacity') is-invalid @enderror"
                                             value="{{ old('engine_capacity') }}" required>
+
+                                        @error('engine_capacity')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Moc (KM)</label>
-                                        <input type="number" name="power_hp" class="form-control"
+                                        <input type="number" name="power_hp"
+                                            class="form-control @error('power_hp') is-invalid @enderror"
                                             value="{{ old('power_hp') }}" required>
+
+                                        @error('power_hp')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-12 mb-3">
@@ -137,6 +214,10 @@
                                         <div id="map" style="height: 350px; border-radius: 10px;"></div>
 
                                         <input type="hidden" name="city" id="city">
+
+                                        @error('city')
+                                            <div class="text-danger mt-2">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
                                     <div class="col-12">

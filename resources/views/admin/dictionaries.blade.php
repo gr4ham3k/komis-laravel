@@ -1,32 +1,52 @@
 @extends('layouts.app')
 
 @push('styles')
-<style>
-    body { background: #f8f9fa; }
+    <style>
+        body {
+            background: #f8f9fa;
+        }
 
-    .tab-content {
-        background: #fff;
-        padding: 20px;
-        border: 1px solid #dee2e6;
-        border-top: none;
-    }
+        .tab-content {
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+        }
 
-    .dictionary-item { gap: 12px; }
-    .dictionary-actions { flex-shrink: 0; }
+        .dictionary-item {
+            gap: 12px;
+        }
 
-    .dictionary-edit {
-        border-top: 1px solid #dee2e6;
-        margin-top: 12px;
-        padding-top: 12px;
-    }
-</style>
+        .dictionary-actions {
+            flex-shrink: 0;
+        }
+
+        .dictionary-edit {
+            border-top: 1px solid #dee2e6;
+            margin-top: 12px;
+            padding-top: 12px;
+        }
+    </style>
 @endpush
 
 @section('content')
 
-<body>
+    @php
+        $activeTab = old('active_tab', session('activeTab', 'brands'));
+    @endphp
 
     <div class="container py-4">
+
+
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
             <h2 class="mb-0">Panel admina - Słowniki</h2>
@@ -36,37 +56,60 @@
         </div>
 
         <ul class="nav nav-tabs" id="dictTabs" role="tablist">
+
             <li class="nav-item">
-                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#brands"
-                    type="button">Marki</button>
+                <button class="nav-link {{ $activeTab == 'brands' ? 'active' : '' }}" data-bs-toggle="tab"
+                    data-bs-target="#brands">
+                    Marki
+                </button>
             </li>
+
             <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#models" type="button">Modele</button>
+                <button class="nav-link {{ $activeTab == 'models' ? 'active' : '' }}" data-bs-toggle="tab"
+                    data-bs-target="#models">
+                    Modele
+                </button>
             </li>
+
             <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#fuels" type="button">Paliwa</button>
+                <button class="nav-link {{ $activeTab == 'fuels' ? 'active' : '' }}" data-bs-toggle="tab"
+                    data-bs-target="#fuels">
+                    Paliwa
+                </button>
             </li>
+
             <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#transmissions" type="button">Skrzynie
-                    biegów</button>
+                <button class="nav-link {{ $activeTab == 'transmissions' ? 'active' : '' }}" data-bs-toggle="tab"
+                    data-bs-target="#transmissions">
+                    Skrzynie biegów
+                </button>
             </li>
+
             <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#bodytypes"
-                    type="button">Nadwozia</button>
+                <button class="nav-link {{ $activeTab == 'bodytypes' ? 'active' : '' }}" data-bs-toggle="tab"
+                    data-bs-target="#bodytypes">
+                    Nadwozia
+                </button>
             </li>
+
             <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tags" type="button">Tagi</button>
+                <button class="nav-link {{ $activeTab == 'tags' ? 'active' : '' }}" data-bs-toggle="tab"
+                    data-bs-target="#tags">
+                    Tagi
+                </button>
             </li>
+
         </ul>
 
         <div class="tab-content">
 
-            <div class="tab-pane fade show active" id="brands">
+            <div class="tab-pane fade {{ $activeTab == 'brands' ? 'show active' : '' }}" id="brands">
                 <h4>Marki</h4>
 
                 <form method="POST" action="{{ route('admin.dictionaries.brands.store') }}" class="d-flex gap-2 mb-3">
                     @csrf
                     <input type="text" name="name" class="form-control" placeholder="Nowa marka">
+                    <input type="hidden" name="active_tab" value="brands">
                     <button class="btn btn-primary">Dodaj</button>
                 </form>
 
@@ -93,13 +136,15 @@
                             </div>
 
                             <div class="collapse dictionary-edit" id="edit-brand-{{ $brand->id }}">
-                                <form method="POST"
-                                    action="{{ route('admin.dictionaries.brands.update', $brand->id) }}"
+                                <form method="POST" action="{{ route('admin.dictionaries.brands.update', $brand->id) }}"
                                     class="d-flex gap-2">
                                     @csrf
                                     @method('PATCH')
-                                    <input type="text" name="name" class="form-control"
-                                        value="{{ $brand->name }}" placeholder="Nazwa marki">
+                                    <input type="text" name="name" class="form-control" value="{{ $brand->name }}"
+                                        placeholder="Nazwa marki">
+
+                                    <input type="hidden" name="active_tab" value="brands">
+
                                     <button class="btn btn-success">Zapisz</button>
                                     <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#edit-brand-{{ $brand->id }}">Anuluj</button>
@@ -110,7 +155,7 @@
                 </div>
             </div>
 
-            <div class="tab-pane fade" id="models">
+            <div class="tab-pane fade {{ $activeTab == 'models' ? 'show active' : '' }}" id="models">
                 <h4>Modele</h4>
 
                 <form method="POST" action="{{ route('admin.dictionaries.models.store') }}" class="row g-2 mb-3">
@@ -128,6 +173,8 @@
                     <div class="col-md-5">
                         <input type="text" name="name" class="form-control" placeholder="Model">
                     </div>
+
+                    <input type="hidden" name="active_tab" value="models">
 
                     <div class="col-md-2">
                         <button class="btn btn-primary w-100">Dodaj</button>
@@ -157,8 +204,7 @@
                             </div>
 
                             <div class="collapse dictionary-edit" id="edit-model-{{ $model->id }}">
-                                <form method="POST"
-                                    action="{{ route('admin.dictionaries.models.update', $model->id) }}"
+                                <form method="POST" action="{{ route('admin.dictionaries.models.update', $model->id) }}"
                                     class="row g-2">
                                     @csrf
                                     @method('PATCH')
@@ -177,6 +223,8 @@
                                             value="{{ $model->name }}" placeholder="Nazwa modelu">
                                     </div>
 
+                                    <input type="hidden" name="active_tab" value="models">
+
                                     <div class="col-md-2">
                                         <button class="btn btn-success w-100">Zapisz</button>
                                     </div>
@@ -193,13 +241,14 @@
                 </div>
             </div>
 
-            <div class="tab-pane fade" id="fuels">
+            <div class="tab-pane fade {{ $activeTab == 'fuels' ? 'show active' : '' }}" id="fuels">
                 <h4>Paliwa</h4>
 
-                <form method="POST" action="{{ route('admin.dictionaries.fuels.store') }}"
-                    class="d-flex gap-2 mb-3">
+                <form method="POST" action="{{ route('admin.dictionaries.fuels.store') }}" class="d-flex gap-2 mb-3">
                     @csrf
                     <input type="text" name="name" class="form-control" placeholder="Nowe paliwo">
+                    <input type="hidden" name="active_tab" value="fuels">
+
                     <button class="btn btn-primary">Dodaj</button>
                 </form>
 
@@ -226,16 +275,15 @@
                             </div>
 
                             <div class="collapse dictionary-edit" id="edit-fuel-{{ $fuel->id }}">
-                                <form method="POST"
-                                    action="{{ route('admin.dictionaries.fuels.update', $fuel->id) }}"
+                                <form method="POST" action="{{ route('admin.dictionaries.fuels.update', $fuel->id) }}"
                                     class="d-flex gap-2">
                                     @csrf
                                     @method('PATCH')
                                     <input type="text" name="name" class="form-control"
                                         value="{{ $fuel->name }}" placeholder="Nazwa paliwa">
+                                    <input type="hidden" name="active_tab" value="fuels">
                                     <button class="btn btn-success">Zapisz</button>
-                                    <button class="btn btn-outline-secondary" type="button"
-                                        data-bs-toggle="collapse"
+                                    <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#edit-fuel-{{ $fuel->id }}">Anuluj</button>
                                 </form>
                             </div>
@@ -244,13 +292,14 @@
                 </div>
             </div>
 
-            <div class="tab-pane fade" id="transmissions">
+            <div class="tab-pane fade {{ $activeTab == 'transmissions' ? 'show active' : '' }}" id="transmissions">
                 <h4>Skrzynie biegów</h4>
 
                 <form method="POST" action="{{ route('admin.dictionaries.transmissions.store') }}"
                     class="d-flex gap-2 mb-3">
                     @csrf
                     <input type="text" name="name" class="form-control" placeholder="Nowa skrzynia">
+                    <input type="hidden" name="active_tab" value="transmissions">
                     <button class="btn btn-primary">Dodaj</button>
                 </form>
 
@@ -285,9 +334,9 @@
                                     @method('PATCH')
                                     <input type="text" name="name" class="form-control"
                                         value="{{ $t->name }}" placeholder="Nazwa skrzyni">
+                                    <input type="hidden" name="active_tab" value="transmissions">
                                     <button class="btn btn-success">Zapisz</button>
-                                    <button class="btn btn-outline-secondary" type="button"
-                                        data-bs-toggle="collapse"
+                                    <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#edit-transmission-{{ $t->id }}">Anuluj</button>
                                 </form>
                             </div>
@@ -296,13 +345,13 @@
                 </div>
             </div>
 
-            <div class="tab-pane fade" id="bodytypes">
+            <div class="tab-pane fade {{ $activeTab == 'bodytypes' ? 'show active' : '' }}" id="bodytypes">
                 <h4>Nadwozia</h4>
 
-                <form method="POST" action="{{ route('admin.dictionaries.bodies.store') }}"
-                    class="d-flex gap-2 mb-3">
+                <form method="POST" action="{{ route('admin.dictionaries.bodies.store') }}" class="d-flex gap-2 mb-3">
                     @csrf
                     <input type="text" name="name" class="form-control" placeholder="Typ nadwozia">
+                    <input type="hidden" name="active_tab" value="bodytypes">
                     <button class="btn btn-primary">Dodaj</button>
                 </form>
 
@@ -314,8 +363,7 @@
 
                                 <div class="dictionary-actions d-flex gap-2">
                                     <button class="btn btn-sm btn-outline-secondary" type="button"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#edit-body-type-{{ $bt->id }}">
+                                        data-bs-toggle="collapse" data-bs-target="#edit-body-type-{{ $bt->id }}">
                                         Edytuj
                                     </button>
 
@@ -330,16 +378,15 @@
                             </div>
 
                             <div class="collapse dictionary-edit" id="edit-body-type-{{ $bt->id }}">
-                                <form method="POST"
-                                    action="{{ route('admin.dictionaries.bodies.update', $bt->id) }}"
+                                <form method="POST" action="{{ route('admin.dictionaries.bodies.update', $bt->id) }}"
                                     class="d-flex gap-2">
                                     @csrf
                                     @method('PATCH')
                                     <input type="text" name="name" class="form-control"
                                         value="{{ $bt->name }}" placeholder="Typ nadwozia">
+                                    <input type="hidden" name="active_tab" value="bodytypes">
                                     <button class="btn btn-success">Zapisz</button>
-                                    <button class="btn btn-outline-secondary" type="button"
-                                        data-bs-toggle="collapse"
+                                    <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#edit-body-type-{{ $bt->id }}">Anuluj</button>
                                 </form>
                             </div>
@@ -348,13 +395,13 @@
                 </div>
             </div>
 
-            <div class="tab-pane fade" id="tags">
+            <div class="tab-pane fade {{ $activeTab == 'tags' ? 'show active' : '' }}" id="tags">
                 <h4>Tagi</h4>
 
-                <form method="POST" action="{{ route('admin.dictionaries.tags.store') }}"
-                    class="d-flex gap-2 mb-3">
+                <form method="POST" action="{{ route('admin.dictionaries.tags.store') }}" class="d-flex gap-2 mb-3">
                     @csrf
                     <input type="text" name="name" class="form-control" placeholder="Nowy tag">
+                    <input type="hidden" name="active_tab" value="tags">
                     <button class="btn btn-primary">Dodaj</button>
                 </form>
 
@@ -388,6 +435,7 @@
 
                                     <input type="text" name="name" class="form-control"
                                         value="{{ $tag->name }}">
+                                    <input type="hidden" name="active_tab" value="tags">
                                     <button class="btn btn-success">Zapisz</button>
                                 </form>
                             </div>

@@ -46,10 +46,13 @@ class ListingController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric',
+            'description' => 'required|string|min:20',
+
+            'price' => 'required|numeric|min:0',
+
             'city' => 'required|string|max:255',
-            'year' => 'required|integer',
+
+            'year' => 'required|integer|min:1900|max:' . date('Y'),
 
             'brand_id' => 'required|exists:brands,id',
             'model_id' => 'required|exists:car_models,id',
@@ -58,15 +61,26 @@ class ListingController extends Controller
             'body_type_id' => 'required|exists:body_types,id',
 
             'color' => 'required|string|max:255',
-            'mileage' => 'required|integer',
-            'engine_capacity' => 'required|integer',
-            'power_hp' => 'required|integer',
+
+            'mileage' => 'required|integer|min:0',
+
+            'engine_capacity' => 'required|integer|min:50|max:10000',
+
+            'power_hp' => 'required|integer|min:1|max:3000',
 
             'tags' => 'array'
+        ], [
+            'price.min' => 'Cena nie może być ujemna.',
+            'year.min' => 'Podaj poprawny rok produkcji.',
+            'year.max' => 'Rok produkcji nie może być większy niż bieżący.',
+            'mileage.min' => 'Przebieg nie może być ujemny.',
+            'engine_capacity.min' => 'Pojemność silnika jest zbyt mała.',
+            'engine_capacity.max' => 'Pojemność silnika jest zbyt duża.',
+            'power_hp.min' => 'Moc musi być większa od 0 KM.',
+            'power_hp.max' => 'Moc jest zbyt duża.',
+
         ]);
 
-        // Local database fallback used before authentication was connected.
-        // $validated['user_id'] = 1;
         $validated['user_id'] = Auth::id();
         $validated['status'] = 'inactive';
         $validated['views_count'] = 0;

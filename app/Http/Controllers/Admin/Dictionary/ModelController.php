@@ -20,32 +20,41 @@ class ModelController extends Controller
             'name' => $request->name
         ]);
 
-        return back();
+         return redirect()
+            ->back()
+            ->with('activeTab', 'models')
+            ->with('success', 'Dodano model');
     }
 
     public function update(Request $request, $id)
     {
-        $brand = CarModel::findOrFail($id);
+        $model = CarModel::findOrFail($id);
 
         $request -> validate([
             'brand_id' => 'required|exists:brands,id',
             'name' => 'required|string|max:255'
         ]);
 
-        $brand -> update([
+        $model -> update([
             'brand_id' => $request->brand_id,
             'name' => $request -> name
         ]);
 
-        return back();
+         return redirect()
+            ->back()
+            ->with('activeTab', 'models')
+            ->with('success', 'Zmodyfikowano model');
     }
 
     public function destroy($id)
     {
-        $brand = CarModel::findOrFail($id);
+        $model = CarModel::findOrFail($id);
 
-        $brand -> delete();
+        $model -> delete();
 
-        return back();
+         return redirect()
+            ->back()
+            ->with('activeTab', 'models')
+            ->with('success', 'Usunięto model');
     }
 }

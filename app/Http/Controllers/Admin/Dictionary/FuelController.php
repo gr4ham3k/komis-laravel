@@ -18,30 +18,39 @@ class FuelController extends Controller
             'name' => $request->name
         ]);
 
-        return back();
+        return redirect()
+            ->back()
+            ->with('activeTab', 'fuels')
+            ->with('success', 'Dodano paliwo');
     }
 
     public function update(Request $request, $id)
     {
-        $brand = Fuel::findOrFail($id);
+        $fuel = Fuel::findOrFail($id);
 
         $request -> validate([
             'name' => 'required|string|max:255'
         ]);
 
-        $brand -> update([
+        $fuel -> update([
             'name' => $request -> name
         ]);
 
-        return back();
+        return redirect()
+            ->back()
+            ->with('activeTab', 'fuels')
+            ->with('success', 'Zmodyfikowano paliwo');
     }
 
     public function destroy($id)
     {
-        $brand = Fuel::findOrFail($id);
+        $fuel = Fuel::findOrFail($id);
 
-        $brand -> delete();
+        $fuel -> delete();
 
-        return back();
+        return redirect()
+            ->back()
+            ->with('activeTab', 'fuels')
+            ->with('success', 'Usunięto paliwo');
     }
 }

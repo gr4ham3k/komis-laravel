@@ -10,7 +10,7 @@ class BodyTypeController extends Controller
 {
     public function store(Request $request)
     {
-        $request -> validate([
+        $request->validate([
             'name' => 'required|string|max:255'
         ]);
 
@@ -18,30 +18,39 @@ class BodyTypeController extends Controller
             'name' => $request->name
         ]);
 
-        return back();
+        return redirect()
+            ->back()
+            ->with('activeTab', 'bodytypes')
+            ->with('success', 'Dodano nadwozie');
     }
 
     public function update(Request $request, $id)
     {
-        $brand = BodyType::findOrFail($id);
+        $bodytype = BodyType::findOrFail($id);
 
-        $request -> validate([
+        $request->validate([
             'name' => 'required|string|max:255'
         ]);
 
-        $brand -> update([
-            'name' => $request -> name
+        $bodytype->update([
+            'name' => $request->name
         ]);
 
-        return back();
+        return redirect()
+            ->back()
+            ->with('activeTab', 'bodytypes')
+            ->with('success', 'Zmodyfikowano nadwozie');
     }
 
     public function destroy($id)
     {
-        $brand = BodyType::findOrFail($id);
+        $bodytype = BodyType::findOrFail($id);
 
-        $brand -> delete();
+        $bodytype->delete();
 
-        return back();
+        return redirect()
+            ->back()
+            ->with('activeTab', 'bodytypes')
+            ->with('success', 'Usunięto nadwozie');
     }
 }

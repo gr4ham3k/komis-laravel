@@ -18,7 +18,10 @@ class TagController extends Controller
             'name' => $request->name,
         ]);
 
-        return back();
+         return redirect()
+            ->back()
+            ->with('activeTab', 'tags')
+            ->with('success', 'Dodano tag');
     }
 
     public function update(Request $request, $id)
@@ -33,7 +36,10 @@ class TagController extends Controller
             'name' => $request->name,
         ]);
 
-        return back();
+         return redirect()
+            ->back()
+            ->with('activeTab', 'tags')
+            ->with('success', 'Zmodyfikowano tag');
     }
 
     public function destroy($id)
@@ -42,6 +48,9 @@ class TagController extends Controller
 
         $tag->delete();
 
-        return back();
+         return redirect()
+            ->back()
+            ->with('activeTab', 'tags')
+            ->with('success', 'Usunięto tag');
     }
 }

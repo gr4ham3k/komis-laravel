@@ -18,30 +18,39 @@ class TransmissionController extends Controller
             'name' => $request->name
         ]);
 
-        return back();
+         return redirect()
+            ->back()
+            ->with('activeTab', 'transmissions')
+            ->with('success', 'Dodano skrzynię biegów');
     }
 
     public function update(Request $request, $id)
     {
-        $brand = Transmission::findOrFail($id);
+        $transmission = Transmission::findOrFail($id);
 
         $request -> validate([
             'name' => 'required|string|max:255'
         ]);
 
-        $brand -> update([
+        $transmission -> update([
             'name' => $request -> name
         ]);
 
-        return back();
+        return redirect()
+            ->back()
+            ->with('activeTab', 'transmissions')
+            ->with('success', 'Zmodyfikowano skrzynię biegów');
     }
 
     public function destroy($id)
     {
-        $brand = Transmission::findOrFail($id);
+        $transmission = Transmission::findOrFail($id);
 
-        $brand -> delete();
+        $transmission -> delete();
 
-        return back();
+        return redirect()
+            ->back()
+            ->with('activeTab', 'transmissions')
+            ->with('success', 'Usunięto skrzynię biegów');
     }
 }

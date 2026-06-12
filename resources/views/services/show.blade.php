@@ -5,6 +5,33 @@
 <div class="container my-4">
     <div class="row">
         <div class="col-md-8">
+            @if ($service->images->count() > 0)
+                <div id="carouselExample" class="carousel slide mb-3 shadow-sm" style="border-radius: 10px; overflow: hidden;">
+                    <div class="carousel-inner">
+                        @foreach ($service->images as $index => $image)
+                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                <img src="{{ asset('storage/services/' . $image->file_name) }}" class="d-block w-100"
+                                    style="height: 450px; object-fit: cover;">
+                            </div>
+                        @endforeach
+                    </div>
+
+                    @if ($service->images->count() > 1)
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Poprzednie</span>
+                        </button>
+
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Następne</span>
+                        </button>
+                    @endif
+                </div>
+            @endif
+
             <!-- Service Details -->
             <div class="card mb-3">
                 <div class="card-body">
@@ -135,12 +162,29 @@
                     <h3 class="text-success mb-1">{{ number_format($service->price, 2) }} PLN</h3>
                     <hr>
                     <div class="d-grid gap-2">
-                        <form method="get" action="{{ route('conversations.startService', $service->id) }}">
-                            @csrf
-                            <button class="btn btn-primary w-100">
-                                <i class="fas fa-comments"></i> Napisz do usługodawcy
-                            </button>
-                        </form>
+                        @if(Auth::id() !== $service->user_id)
+                            <form method="get" action="{{ route('conversations.startService', $service->id) }}">
+                                @csrf
+                                <button class="btn btn-primary w-100">
+                                    <i class="fas fa-comments"></i> Napisz do usługodawcy
+                                </button>
+                            </form>
+                        @endif
+
+                        @auth
+                            @if(Auth::id() === $service->user_id)
+                                <a href="{{ route('services.edit', $service->id) }}" class="btn btn-warning w-100">
+                                    <i class="fas fa-edit me-1"></i> Edytuj usługę
+                                </a>
+                                <form method="POST" action="{{ route('services.destroy', $service->id) }}" onsubmit="return confirm('Czy na pewno chcesz usunąć tę usługę?')" class="w-100">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger w-100">
+                                        <i class="fas fa-trash me-1"></i> Usuń usługę
+                                    </button>
+                                </form>
+                            @endif
+                        @endauth
 
                         @auth
                             @if(Auth::user()->is_admin)

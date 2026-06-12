@@ -45,6 +45,16 @@ class ServiceAdminController extends Controller
     public function destroy($id)
     {
         $service = Service::findOrFail($id);
+
+        // Usuwanie wszystkich powiązanych zdjęć z dysku i bazy
+        foreach ($service->images as $image) {
+            $filePath = storage_path('app/public/services/' . $image->file_name);
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            $image->delete();
+        }
+
         $service->delete();
 
         return redirect()

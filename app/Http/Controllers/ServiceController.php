@@ -16,30 +16,74 @@ class ServiceController extends Controller
     {
         $search = trim((string) $request->query('search'));
 
-        $services = Service::with('user', 'reviews', 'images')
-            ->where('status', 'active')
-            ->when($search !== '', function ($query) use ($search) {
-                $query->where(function ($query) use ($search) {
-                    $query->where('title', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%")
-                        ->orWhere('city', 'like', "%{$search}%");
-                });
-            })
-            ->latest()
-            ->paginate(12)
-            ->withQueryString();
-        
-        return view('services.index', compact('services', 'search'));
+        // Pobranie unikalnych miast dla selecta filtrów
+        $cities = Service::where('status', 'active')
+            ->select('city')
+            ->distinct()
+            ->pluck('city');
+
+        $query = Service::with('user', 'reviews', 'images')
+            ->where('status', 'active');
+
+        // Filtrowanie po wyszukiwaniu tekstowym
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('city', 'like', "%{$search}%");
+            });
+        }
+
+        // ✅ FILTR: Miasto
+        if ($request->filled('city')) {
+            $query->where('city', 'like', '%' . $request->city . '%');
+        }
+
+        // ✅ FILTR: Cena minimalna
+        if ($request->filled('price_min')) {
+            $query->where('price', '>=', (float) $request->price_min);
+        }
+
+        // ✅ FILTR: Cena maksymalna
+        if ($request->filled('price_max')) {
+            $query->where('price', '<=', (float) $request->price_max);
+        }
+
+        // ✅ SORTOWANIE
+        switch ($request->get('sort')) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'popular':
+                $query->orderBy('views_count', 'desc');
+                break;
+            case 'best_rated':
+                $query->withAvg('reviews', 'rating')->orderBy('reviews_avg_rating', 'desc');
+                break;
+            default: // newest
+                $query->latest();
+                break;
+        }
+
+        $services = $query->paginate(12)->withQueryString();
+
+        return view('services.index', compact('services', 'search', 'cities'));
     }
 
     public function show($id)
     {
         $service = Service::with('user', 'reviews.user', 'images')
             ->findOrFail($id);
-        
+
         // Increment views count
         $service->increment('views_count');
-        
+
         return view('services.show', compact('service'));
     }
 
@@ -99,76 +143,72 @@ class ServiceController extends Controller
     }
 
     public function update(Request $request, $id)
-{
-    $service = Service::where('user_id', Auth::id())->findOrFail($id);
-    
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'description' => 'required|string',
-        'price' => 'required|numeric|min:0',
-        'city' => 'required|string|max:255',
-        'delete_images' => 'nullable|array',
-        'delete_images.*' => 'exists:images,id',
-        'new_images' => 'nullable|array',
-        'new_images.*' => 'image|max:2048'
-    ]);
+    {
+        $service = Service::where('user_id', Auth::id())->findOrFail($id);
 
-    // Aktualizacja danych podstawowych
-    $service->update([
-        'title' => $validated['title'],
-        'description' => $validated['description'],
-        'price' => $validated['price'],
-        'city' => $validated['city'],
-    ]);
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'city' => 'required|string|max:255',
+            'delete_images' => 'nullable|array',
+            'delete_images.*' => 'exists:images,id',
+            'new_images' => 'nullable|array',
+            'new_images.*' => 'image|max:2048'
+        ]);
 
-    // Usuwanie zaznaczonych zdjęć
-    if ($request->has('delete_images')) {
-        foreach ($request->delete_images as $imageId) {
-            $image = Image::find($imageId);
-            if ($image) {
-                // Usuń plik z dysku
-                $filePath = storage_path('app/public/services/' . $image->file_name);
-                if (file_exists($filePath)) {
-                    unlink($filePath);
+        // Aktualizacja danych podstawowych
+        $service->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'city' => $validated['city'],
+        ]);
+
+        // Usuwanie zaznaczonych zdjęć
+        if ($request->has('delete_images')) {
+            foreach ($request->delete_images as $imageId) {
+                $image = Image::find($imageId);
+                if ($image) {
+                    $filePath = storage_path('app/public/services/' . $image->file_name);
+                    if (file_exists($filePath)) {
+                        unlink($filePath);
+                    }
+                    $service->images()->detach($imageId);
+                    $image->delete();
                 }
-                // Odepnij relację
-                $service->images()->detach($imageId);
-                // Usuń rekord obrazu
-                $image->delete();
             }
         }
-    }
 
-    // Dodawanie nowych zdjęć
-    if ($request->hasFile('new_images')) {
-        foreach ($request->file('new_images') as $imageFile) {
-            if ($imageFile && $imageFile->isValid()) {
-                $uuid = (string) Str::uuid();
-                $extension = $imageFile->getClientOriginalExtension();
-                $fileName = $uuid . '.' . $extension;
+        // Dodawanie nowych zdjęć
+        if ($request->hasFile('new_images')) {
+            foreach ($request->file('new_images') as $imageFile) {
+                if ($imageFile && $imageFile->isValid()) {
+                    $uuid = (string) Str::uuid();
+                    $extension = $imageFile->getClientOriginalExtension();
+                    $fileName = $uuid . '.' . $extension;
 
-                $imageFile->storeAs('services', $fileName, 'public');
+                    $imageFile->storeAs('services', $fileName, 'public');
 
-                $image = Image::create([
-                    'file_name' => $fileName,
-                    'original_name' => $imageFile->getClientOriginalName(),
-                    'file_type' => $imageFile->getClientMimeType(),
-                ]);
+                    $image = Image::create([
+                        'file_name' => $fileName,
+                        'original_name' => $imageFile->getClientOriginalName(),
+                        'file_type' => $imageFile->getClientMimeType(),
+                    ]);
 
-                $service->images()->attach($image->id);
+                    $service->images()->attach($image->id);
+                }
             }
         }
-    }
 
-    return redirect()->route('services.show', $service->id)
-        ->with('success', 'Usługa została zaktualizowana!');
-}
+        return redirect()->route('services.show', $service->id)
+            ->with('success', 'Usługa została zaktualizowana!');
+    }
 
     public function destroy($id)
     {
         $service = Service::where('user_id', Auth::id())->findOrFail($id);
 
-        // Usuwanie wszystkich powiązanych zdjęć z dysku i bazy
         foreach ($service->images as $image) {
             $filePath = storage_path('app/public/services/' . $image->file_name);
             if (file_exists($filePath)) {
@@ -192,7 +232,6 @@ class ServiceController extends Controller
 
         $service = Service::findOrFail($id);
 
-        // Check if user already reviewed this service
         $existingReview = ServiceReview::where('service_id', $id)
             ->where('user_id', Auth::id())
             ->first();
@@ -216,7 +255,7 @@ class ServiceController extends Controller
         $services = Service::where('user_id', Auth::id())
             ->latest()
             ->paginate(10);
-        
+
         return view('services.my-services', compact('services'));
     }
 }

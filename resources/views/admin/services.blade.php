@@ -260,7 +260,7 @@
                     <div class="modal-header border-0 pb-0">
                         <h5 class="modal-title">
                             <i class="fas fa-edit text-warning me-2"></i>
-                            Edytuj usługę
+                            Edytuj usługę użytkownikowi
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>

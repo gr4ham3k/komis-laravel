@@ -53,7 +53,7 @@
                                 <label class="form-label">Dodaj zdjęcia</label>
                                 <input type="file" name="images[]" class="form-control @error('images') is-invalid @enderror @error('images.*') is-invalid @enderror"
                                        multiple accept="image/*">
-                                <small class="text-muted">Możesz wybrać zdjęcie(Max 2MB)
+                                <small class="text-muted">Proszę wybrać zdjęcie(Max 2MB)
                                 </small>
                                 @error('images')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>

@@ -78,7 +78,7 @@
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label">Dodaj nowe zdjęcia</label>
+                                <label class="form-label">Dodaj nowe zdjęcie</label>
                                 <input type="file" name="new_images[]" class="form-control @error('new_images') is-invalid @enderror @error('new_images.*') is-invalid @enderror"
                                        multiple accept="image/*">
                                 <small class="text-muted">Proszę dodać zdjęcie(Max 2MB)</small>

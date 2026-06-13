@@ -50,7 +50,7 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">Dodaj zdjęcia</label>
+                                <label class="form-label">Dodaj zdjęcie</label>
                                 <input type="file" name="images[]" class="form-control @error('images') is-invalid @enderror @error('images.*') is-invalid @enderror"
                                        multiple accept="image/*">
                                 <small class="text-muted">Proszę wybrać zdjęcie(Max 2MB)

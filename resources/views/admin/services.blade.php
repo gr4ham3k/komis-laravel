@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Usługi - Admin</title>
+@extends('layouts.app')
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+@push('styles')
     <style>
         body {
             background: #f4f6f8;
@@ -103,31 +97,26 @@
             .table-responsive {
                 border-radius: 6px;
             }
-            
+
             .service-description {
                 max-width: 220px;
             }
         }
     </style>
-</head>
-<body>
+@endpush
 
-<div class="container services-shell my-4">
-    <div class="mb-4">
-        <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-start align-items-md-center">
-            <div>
-                <h1 class="h3 mb-1">Panel admina - Usługi</h1>
-                <p class="text-muted mb-0">Zarządzanie usługami motoryzacyjnymi</p>
-            </div>
-
-            <div class="d-flex gap-2">
-                <a href="{{ route('admin.dictionaries.index') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-book"></i> Słowniki
-                </a>
-                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createServiceModal">
-                    <i class="fas fa-plus"></i> Dodaj usługę
-                </button>
-            </div>
+@section('content')
+<div class="container services-shell py-4">
+    <!-- Górny pasek z przyciskami - taki jak w dictionaries -->
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+        <h2 class="mb-0">Panel admina - Usługi</h2>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.dictionaries.index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-book"></i> Słowniki
+            </a>
+            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#createServiceModal">
+                <i class="fas fa-plus"></i> Dodaj usługę
+            </button>
         </div>
     </div>
 
@@ -322,7 +311,4 @@
         </div>
     </div>
 @endforeach
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+@endsection

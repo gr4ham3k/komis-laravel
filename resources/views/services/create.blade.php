@@ -24,7 +24,7 @@
                         <div class="row g-3">
                             <div class="col-12">
                                 <label class="form-label">Tytuł usługi</label>
-                                <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" 
+                                <input type="text" name="title" class="form-control @error('title') is-invalid @enderror"
                                        value="{{ old('title') }}" required>
                                 @error('title')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -33,7 +33,7 @@
 
                             <div class="col-12">
                                 <label class="form-label">Opis</label>
-                                <textarea name="description" rows="5" class="form-control @error('description') is-invalid @enderror" 
+                                <textarea name="description" rows="5" class="form-control @error('description') is-invalid @enderror"
                                           required>{{ old('description') }}</textarea>
                                 @error('description')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -42,7 +42,7 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">Cena (PLN)</label>
-                                <input type="number" step="0.01" name="price" class="form-control @error('price') is-invalid @enderror" 
+                                <input type="number" step="0.01" name="price" class="form-control @error('price') is-invalid @enderror"
                                        value="{{ old('price') }}" required>
                                 @error('price')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -51,9 +51,10 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">Dodaj zdjęcia</label>
-                                <input type="file" name="images[]" class="form-control @error('images') is-invalid @enderror @error('images.*') is-invalid @enderror" 
+                                <input type="file" name="images[]" class="form-control @error('images') is-invalid @enderror @error('images.*') is-invalid @enderror"
                                        multiple accept="image/*">
-                                <small class="text-muted">Możesz wybrać kilka zdjęć (maks. 2MB każde)</small>
+                                <small class="text-muted">Możesz wybrać zdjęcie(Max 2MB)
+                                </small>
                                 @error('images')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
@@ -94,35 +95,35 @@
 <script>
     // Inicjalizacja mapy - tak jak w oryginalnej wersji
     const map = L.map('map').setView([52.237049, 21.017532], 12);
-    
+
     // Dodanie warstwy mapy - identyczna konfiguracja
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap'
     }).addTo(map);
-    
+
     let marker;
-    
+
     // Obsługa kliknięcia na mapie - identyczna logika
     map.on('click', function(e) {
-        
+
         if (marker) {
             map.removeLayer(marker);
         }
-        
+
         marker = L.marker(e.latlng).addTo(map);
-        
+
         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
             .then(res => res.json())
             .then(data => {
-                
+
                 const city = data.address.city ||
                            data.address.town ||
                            data.address.village ||
                            data.address.state ||
                            '';
-                
+
                 document.getElementById('city').value = city;
-                
+
                 console.log("Wybrane miasto:", city);
             });
     });

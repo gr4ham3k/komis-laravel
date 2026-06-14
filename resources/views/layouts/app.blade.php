@@ -88,7 +88,7 @@
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}"
                                     href="{{ route('admin.services.index') }}"
-                                    @if (request()->routeIs('admin.*')) aria-current="page" @endif>Panel admina</a>
+                                    @if (request()->routeIs('admin.*')) aria-current="page" @endif>Panel admina-Usługi</a>
                             </li>
                         @endif
                     @endauth

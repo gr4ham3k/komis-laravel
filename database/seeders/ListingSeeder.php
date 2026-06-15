@@ -42,19 +42,16 @@ class ListingSeeder extends Seeder
             'title' => 'BMW Seria 3 320d',
             'description' => 'Zadbane BMW, serwisowane, stan bardzo dobry.',
             'price' => 45000,
-            'status' => 'active',
+            'status' => 'inactive',
             'city' => 'Rzeszów',
-            'color' => 'Czerowny',
+            'color' => 'Srebrny',
             'year' => 2016,
             'mileage' => 180000,
             'engine_capacity' => 2000,
             'power_hp' => 190,
         ]);
 
-        $listing->images()->attach([
-            1 => ['sort_order' => 1],
-            2 => ['sort_order' => 2],
-        ]);
+
 
     }
 }

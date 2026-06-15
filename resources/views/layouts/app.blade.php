@@ -158,7 +158,7 @@
                     @auth
                         @if (Auth::user()->is_admin)
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="{{ route('admin.services.index') }}">Panel admina-Usługi</a>
+                                <a class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="{{ route('admin.services.index') }}">Panel admina</a>
                             </li>
                         @endif
                     @endauth
@@ -173,7 +173,7 @@
                     <li class="nav-item d-lg-none">
                         <a class="nav-link" href="{{ route('listings.create') }}">Dodaj ogłoszenie</a>
                     </li>
-                    
+
                     @auth
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">

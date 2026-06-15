@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -12,14 +12,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement('CREATE EXTENSION IF NOT EXISTS pg_trgm');
+        // wykonaj tylko dla PostgreSQL i poza środowiskiem testowym
+        if (DB::connection()->getDriverName() === 'pgsql' && app()->environment('testing')) {
+            DB::statement('CREATE EXTENSION IF NOT EXISTS pg_trgm');
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        DB::statement('DROP EXTENSION IF EXISTS pg_trgm');
+        // Wykonaj tylko dla PostgreSQL i poza środowiskiem testowym
+        if (DB::connection()->getDriverName() === 'pgsql' && app()->environment('testing')) {
+            DB::statement('DROP EXTENSION IF EXISTS pg_trgm');
+        }
     }
 };

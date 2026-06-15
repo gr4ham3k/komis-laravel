@@ -103,24 +103,47 @@
                     <h4>Opinie klientów</h4>
 
                     @auth
-                        <form method="POST" action="{{ route('services.review', $service->id) }}" class="mb-4">
-                            @csrf
-                            <div class="mb-2">
-                                <label class="form-label">Ocena</label>
-                                <select name="rating" class="form-select" required>
-                                    <option value="5">★★★★★ (5)</option>
-                                    <option value="4">★★★★☆ (4)</option>
-                                    <option value="3">★★★☆☆ (3)</option>
-                                    <option value="2">★★☆☆☆ (2)</option>
-                                    <option value="1">★☆☆☆☆ (1)</option>
-                                </select>
-                            </div>
-                            <div class="mb-2">
-                                <label class="form-label">Komentarz</label>
-                                <textarea name="comment" class="form-control" rows="3" placeholder="Twoja opinia..."></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Dodaj opinię</button>
-                        </form>
+                        @if ($userReview)
+                            <form method="POST" action="{{ route('services.review.update', $service->id) }}" class="mb-4 border rounded p-3 bg-light">
+                                @csrf
+                                @method('PUT')
+                                <h5 class="mb-3">Twoja opinia</h5>
+                                <div class="mb-2">
+                                    <label class="form-label">Ocena</label>
+                                    <select name="rating" class="form-select" required>
+                                        <option value="5" {{ $userReview->rating == 5 ? 'selected' : '' }}>★★★★★ (5)</option>
+                                        <option value="4" {{ $userReview->rating == 4 ? 'selected' : '' }}>★★★★☆ (4)</option>
+                                        <option value="3" {{ $userReview->rating == 3 ? 'selected' : '' }}>★★★☆☆ (3)</option>
+                                        <option value="2" {{ $userReview->rating == 2 ? 'selected' : '' }}>★★☆☆☆ (2)</option>
+                                        <option value="1" {{ $userReview->rating == 1 ? 'selected' : '' }}>★☆☆☆☆ (1)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Komentarz</label>
+                                    <textarea name="comment" class="form-control" rows="3" placeholder="Twoja opinia...">{{ old('comment', $userReview->comment) }}</textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+                            </form>
+                        @else
+                            <form method="POST" action="{{ route('services.review', $service->id) }}" class="mb-4">
+                                @csrf
+                                <div class="mb-2">
+                                    <label class="form-label">Ocena</label>
+                                    <select name="rating" class="form-select" required>
+                                        <option value="5">★★★★★ (5)</option>
+                                        <option value="4">★★★★☆ (4)</option>
+                                        <option value="3">★★★☆☆ (3)</option>
+                                        <option value="2">★★☆☆☆ (2)</option>
+                                        <option value="1">★☆☆☆☆ (1)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Komentarz</label>
+                                    <textarea name="comment" class="form-control" rows="3" placeholder="Twoja opinia..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Dodaj opinię</button>
+                            </form>
+                        @endif
                     @else
                         <div class="alert alert-info mb-4">
                             <a href="{{ route('login') }}">Zaloguj się</a>, aby dodać opinię.

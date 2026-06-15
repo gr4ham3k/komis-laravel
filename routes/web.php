@@ -15,6 +15,7 @@ use App\Http\Controllers\ListingImageController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\UserPanelController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ListingController::class, 'home'])->name('home');
@@ -94,6 +95,14 @@ Route::middleware('auth')->group(function () {
     Route::put('/services/{id}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('/services/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
     Route::post('/services/{id}/review', [ServiceController::class, 'addReview'])->name('services.review');
+    Route::put('/services/{id}/review', [ServiceController::class, 'updateReview'])->name('services.review.update');
+
+    Route::get('/user/panel', [UserPanelController::class, 'dashboard'])->name('user.panel');
+    Route::get('/user/listings', [UserPanelController::class, 'listings'])->name('my.listings');
+    Route::get('/user/listings/{listing}/edit', [ListingController::class, 'edit'])->name('listings.edit');
+    Route::put('/user/listings/{listing}', [ListingController::class, 'update'])->name('listings.update');
+    Route::delete('/user/listings/{listing}', [ListingController::class, 'destroy'])->name('listings.destroy');
+    Route::get('/user/services', [ServiceController::class, 'myServices'])->name('my.services');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {

@@ -10,6 +10,7 @@ use App\Models\Fuel;
 use App\Models\Transmission;
 use App\Models\BodyType;
 use App\Models\User;
+use App\Models\Image;
 
 class ListingSeeder extends Seeder
 {
@@ -42,7 +43,7 @@ class ListingSeeder extends Seeder
             'title' => 'BMW Seria 3 320d',
             'description' => 'Zadbane BMW, serwisowane, stan bardzo dobry.',
             'price' => 45000,
-            'status' => 'inactive',
+            'status' => 'active',
             'city' => 'Rzeszów',
             'color' => 'Srebrny',
             'year' => 2016,
@@ -51,7 +52,7 @@ class ListingSeeder extends Seeder
             'power_hp' => 190,
         ]);
 
-
+        $listing->images()->attach(Image::pluck('id'));
 
     }
 }

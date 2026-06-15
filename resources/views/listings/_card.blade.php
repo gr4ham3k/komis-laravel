@@ -7,7 +7,7 @@
     <a href="{{ route('listings.show', $listing) }}" class="text-decoration-none">
         @if($listing->images->first())
             <img
-                src="{{ asset('storage/listings/' . $listing->images->first()->file_name) }}"
+                src="{{ asset('storage/' . $listing->images->first()->file_name) }}"
                 class="listing-thumb"
                 alt="{{ $listing->title }}"
             >
@@ -40,7 +40,7 @@
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <span class="fs-5 fw-bold text-success">{{ number_format($listing->price, 0, ',', ' ') }} PLN</span>
             </div>
-            
+
             <div class="d-grid gap-2">
                 @if($isCompared)
                     <form method="POST" action="{{ route('compare.destroy', $listing) }}" class="m-0">

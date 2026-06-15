@@ -2,24 +2,38 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Image;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Image;
+use Illuminate\Database\Seeder;
 
 class ImageSeeder extends Seeder
 {
     public function run(): void
     {
-        Image::create([
-            'original_name' => 'bmw1.jpg',
-            'file_name' => 'bmw1.jpg',
-            'file_type' => 'image/jpeg',
-        ]);
+        $images = [
+            'bmw1.jpg',
+            'bmw2.jpg',
+        ];
 
-        Image::create([
-            'original_name' => 'bmw2.jpg',
-            'file_name' => 'bmw2.jpg',
-            'file_type' => 'image/jpeg',
-        ]);
+        foreach ($images as $img) {
+
+            $sourcePath = database_path('seed-images/' . $img);
+
+            $uuid = (string) Str::uuid() . '.jpg';
+
+            $storagePath = 'listings/' . $uuid;
+
+            Storage::disk('public')->put(
+                $storagePath,
+                file_get_contents($sourcePath)
+            );
+
+            Image::create([
+                'original_name' => $img,
+                'file_name' => $storagePath,
+                'file_type' => 'image/jpeg',
+            ]);
+        }
     }
 }

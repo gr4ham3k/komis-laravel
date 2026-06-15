@@ -34,7 +34,7 @@
                             @foreach ($listing->images as $index => $image)
                                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                                     <img
-                                        src="{{ asset('storage/listings/' . $image->file_name) }}"
+                                        src="{{ asset('storage/' . $image->file_name) }}"
                                         class="d-block w-100 rounded"
                                         style="height: 450px; object-fit: cover;"
                                         alt="{{ $listing->title }}"

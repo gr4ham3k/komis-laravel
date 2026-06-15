@@ -37,11 +37,16 @@
 
                     <a href="{{ route('conversations.show', $conversation->id) }}" class="text-decoration-none text-dark">
 
-                        <div class="p-3 mb-2 rounded hover-bg">
+                        <div class="p-3 mb-2 rounded hover-bg position-relative">
 
-                            <strong style="font-size: 16px;">
-                                {{ $conversation->listing ? $conversation->listing->title : $conversation->service->title }}
-                            </strong>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong style="font-size: 16px;">
+                                    {{ $conversation->listing ? $conversation->listing->title : $conversation->service->title }}
+                                </strong>
+                                @if ($conversation->unread_count > 0)
+                                    <span class="badge bg-danger rounded-pill">{{ $conversation->unread_count }}</span>
+                                @endif
+                            </div>
 
                             <div class="text-muted" style="font-size: 14px;">
                                 {{ $lastMessage?->content ?? 'Brak wiadomości' }}
@@ -88,6 +93,13 @@
 
                                     <div class="text-end" style="font-size: 12px; opacity: 0.7;">
                                         {{ $message->created_at->format('H:i') }}
+                                        @if ($message->sender_id == auth()->id())
+                                            @if ($message->is_read)
+                                                <i class="fas fa-check-double ms-1" style="color: #53bdeb;" title="Przeczytana"></i>
+                                            @else
+                                                <i class="fas fa-check ms-1 text-white-50" title="Dostarczona"></i>
+                                            @endif
+                                        @endif
                                     </div>
 
                                 </div>

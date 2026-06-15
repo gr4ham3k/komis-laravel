@@ -13,22 +13,20 @@
     <!-- Marka i Model -->
     <div class="row g-2 mb-3">
         <div class="col-6">
-            <label for="brand_id" class="form-label small fw-semibold">Marka</label>
-            <select name="brand_id" id="brand_id" class="form-select">
-                <option value="">Wszystkie</option>
-                @foreach($brands as $brand)
-                    <option value="{{ $brand->id }}" @selected(request('brand_id') == $brand->id)>{{ $brand->name }}</option>
-                @endforeach
-            </select>
+            <label for="brand-search" class="form-label small fw-semibold">Marka</label>
+            <div class="position-relative">
+                <input type="text" id="brand-search" class="form-control" placeholder="Wpisz markę..." autocomplete="off" value="{{ $brands->find(request('brand_id'))?->name ?? '' }}">
+                <div id="brand-results" class="list-group position-absolute w-100" style="z-index: 1000; top: 100%; left: 0; display: none;"></div>
+            </div>
+            <input type="hidden" name="brand_id" id="brand-id" value="{{ request('brand_id') }}">
         </div>
         <div class="col-6">
-            <label for="model_id" class="form-label small fw-semibold">Model</label>
-            <select name="model_id" id="model_id" class="form-select">
-                <option value="">Wszystkie</option>
-                @foreach($models as $model)
-                    <option value="{{ $model->id }}" @selected(request('model_id') == $model->id) data-brand="{{ $model->brand_id }}">{{ $model->name }}</option>
-                @endforeach
-            </select>
+            <label for="model-search" class="form-label small fw-semibold">Model</label>
+            <div class="position-relative">
+                <input type="text" id="model-search" class="form-control" placeholder="Wpisz model..." autocomplete="off" value="{{ $models->find(request('model_id'))?->name ?? '' }}">
+                <div id="model-results" class="list-group position-absolute w-100" style="z-index: 1000; top: 100%; left: 0; display: none;"></div>
+            </div>
+            <input type="hidden" name="model_id" id="model-id" value="{{ request('model_id') }}">
         </div>
     </div>
 
@@ -165,47 +163,94 @@
         </div>
     </div>
 
-    <!-- Sortowanie -->
-    @if(request('sort'))
-        <input type="hidden" name="sort" value="{{ request('sort') }}">
-    @endif
-
     <div class="d-grid gap-2">
         <button type="submit" class="btn btn-primary shadow-sm fw-semibold">Pokaż wyniki</button>
     </div>
 </form>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const brandSelect = document.getElementById('brand_id');
-        const modelSelect = document.getElementById('model_id');
-        
-        if (brandSelect && modelSelect) {
-            const allModels = Array.from(modelSelect.options).slice(1);
+(function() {
+    const brandSearch = document.getElementById('brand-search');
+    const brandResults = document.getElementById('brand-results');
+    const brandId = document.getElementById('brand-id');
+    const modelSearch = document.getElementById('model-search');
+    const modelResults = document.getElementById('model-results');
+    const modelId = document.getElementById('model-id');
 
-            function filterModels() {
-                const selectedBrand = brandSelect.value;
-                let validModelSelected = false;
-                
-                allModels.forEach(option => {
-                    if (!selectedBrand || option.dataset.brand === selectedBrand) {
-                        option.style.display = '';
-                        if (option.selected) validModelSelected = true;
-                    } else {
-                        option.style.display = 'none';
-                    }
+    if (!brandSearch || !brandResults || !brandId) return;
+
+    let brandTimer, modelTimer;
+
+    function hide(el) { el.style.display = 'none'; }
+    function show(el) { el.style.display = 'block'; }
+    function empty(el) { el.innerHTML = ''; }
+
+    brandSearch.addEventListener('input', function () {
+        clearTimeout(brandTimer);
+        const q = this.value.trim();
+        if (q.length < 1) { empty(brandResults); hide(brandResults); return; }
+        brandTimer = setTimeout(async () => {
+            try {
+                const res = await fetch(`/brands/search?q=${encodeURIComponent(q)}`);
+                const data = await res.json();
+                empty(brandResults);
+                if (data.length === 0) { hide(brandResults); return; }
+                data.forEach(b => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'list-group-item list-group-item-action';
+                    btn.textContent = b.name;
+                    btn.onmousedown = () => {
+                        brandSearch.value = b.name;
+                        brandId.value = b.id;
+                        empty(brandResults); hide(brandResults);
+                        modelSearch.value = ''; modelId.value = '';
+                        empty(modelResults); hide(modelResults);
+                    };
+                    brandResults.appendChild(btn);
                 });
+                show(brandResults);
+            } catch(e) { console.error(e); }
+        }, 200);
+    });
 
-                if (modelSelect.selectedIndex > 0 && !validModelSelected) {
-                    modelSelect.value = '';
-                }
-            }
+    brandSearch.addEventListener('blur', () => setTimeout(() => hide(brandResults), 300));
 
-            brandSelect.addEventListener('change', filterModels);
-            filterModels();
-        }
+    if (modelSearch && modelResults && modelId) {
+        modelSearch.addEventListener('input', function () {
+            clearTimeout(modelTimer);
+            const q = this.value.trim();
+            const bid = brandId.value;
+            if (!bid || q.length < 1) { empty(modelResults); hide(modelResults); return; }
+            modelTimer = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/models/search?brand_id=${bid}&q=${encodeURIComponent(q)}`);
+                    const data = await res.json();
+                    empty(modelResults);
+                    if (data.length === 0) { hide(modelResults); return; }
+                    data.forEach(m => {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'list-group-item list-group-item-action';
+                        btn.textContent = m.name;
+                        btn.onmousedown = () => {
+                            modelSearch.value = m.name;
+                            modelId.value = m.id;
+                            empty(modelResults); hide(modelResults);
+                        };
+                        modelResults.appendChild(btn);
+                    });
+                    show(modelResults);
+                } catch(e) { console.error(e); }
+            }, 200);
+        });
 
-        // --- Map Logic ---
+        modelSearch.addEventListener('blur', () => setTimeout(() => hide(modelResults), 300));
+    }
+})();
+
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Map Logic ---
         const mapEl = document.getElementById('filter-map');
         if (mapEl && typeof L !== 'undefined') {
             const latInput = document.getElementById('lat');

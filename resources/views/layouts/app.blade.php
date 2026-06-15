@@ -188,6 +188,7 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="{{ route('user.panel') }}">Panel użytkownika</a></li>
+                                <li><a class="dropdown-item" href="{{ route('user.profile') }}">Mój profil</a></li>
                                 <li><a class="dropdown-item" href="{{ route('conversations.index') }}">Wiadomości</a></li>
                                 <li><a class="dropdown-item" href="{{ route('my.listings') }}">Moje ogłoszenia</a></li>
                                 <li><a class="dropdown-item" href="{{ route('my.services') }}">Moje usługi</a></li>

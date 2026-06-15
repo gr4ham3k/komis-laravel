@@ -16,6 +16,7 @@ use App\Http\Controllers\ListingImageController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserPanelController;
 use Illuminate\Support\Facades\Route;
 
@@ -104,6 +105,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/user/listings/{listing}', [ListingController::class, 'update'])->name('listings.update');
     Route::delete('/user/listings/{listing}', [ListingController::class, 'destroy'])->name('listings.destroy');
     Route::get('/user/services', [ServiceController::class, 'myServices'])->name('my.services');
+
+    Route::get('/user/profile', [ProfileController::class, 'edit'])->name('user.profile');
+    Route::put('/user/profile', [ProfileController::class, 'update'])->name('user.profile.update');
+    Route::put('/user/profile/password', [ProfileController::class, 'password'])->name('user.profile.password');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {

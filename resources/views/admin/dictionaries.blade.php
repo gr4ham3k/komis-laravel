@@ -50,9 +50,14 @@
 
         <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
             <h2 class="mb-0">Panel admina - Słowniki</h2>
-            <a href="{{ route('admin.services.index') }}" class="btn btn-outline-primary align-self-start">
-                Usługi
-            </a>
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-users"></i> Użytkownicy
+                </a>
+                <a href="{{ route('admin.services.index') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-wrench"></i> Usługi
+                </a>
+            </div>
         </div>
 
         <ul class="nav nav-tabs" id="dictTabs" role="tablist">

@@ -112,7 +112,9 @@ class ListingController extends Controller
             default => $query->latest(),
         };
 
-        $listings = $query->paginate(12)->withQueryString();
+        $perPage = (int) $request->input('per_page', 12);
+        $perPage = in_array($perPage, [10, 20, 50]) ? $perPage : 12;
+        $listings = $query->paginate($perPage)->withQueryString();
 
         return view('listings.index', array_merge($filterOptions, compact('listings', 'selectedTags')));
     }

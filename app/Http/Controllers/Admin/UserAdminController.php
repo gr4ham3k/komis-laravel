@@ -48,7 +48,7 @@ class UserAdminController extends Controller
         $data = [
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'is_admin' => $request->boolean('is_admin'),
+            'is_admin' => $user->id === auth()->id() ? true : $request->boolean('is_admin'),
         ];
 
         if ($request->filled('password')) {

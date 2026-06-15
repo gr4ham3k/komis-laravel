@@ -176,8 +176,14 @@
                         </div>
                         <div class="form-check">
                             <input type="checkbox" name="is_admin" class="form-check-input" id="editIsAdmin-{{ $user->id }}"
-                                {{ $user->is_admin ? 'checked' : '' }}>
-                            <label class="form-check-label" for="editIsAdmin-{{ $user->id }}">Administrator</label>
+                                {{ $user->is_admin ? 'checked' : '' }}
+                                {{ $user->id === Auth::id() ? 'disabled' : '' }}>
+                            <label class="form-check-label" for="editIsAdmin-{{ $user->id }}">
+                                Administrator
+                                @if ($user->id === Auth::id())
+                                    <span class="text-muted small">(nie możesz sobie odebrać admina)</span>
+                                @endif
+                            </label>
                         </div>
                     </div>
                     <div class="modal-footer border-0 pt-0">

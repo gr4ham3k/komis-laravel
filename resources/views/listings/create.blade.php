@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @push('styles')
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 @endpush
 
 @section('content')
@@ -214,6 +213,8 @@
                                         <div id="map" style="height: 350px; border-radius: 10px;"></div>
 
                                         <input type="hidden" name="city" id="city">
+                                        <input type="hidden" name="latitude" id="latitude">
+                                        <input type="hidden" name="longitude" id="longitude">
 
                                         @error('city')
                                             <div class="text-danger mt-2">{{ $message }}</div>
@@ -255,8 +256,6 @@
             </div>
         </div>
 
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
         <script>
             const map = L.map('map').setView([50.0413, 21.9990], 6);
 
@@ -273,6 +272,9 @@
                 }
 
                 marker = L.marker(e.latlng).addTo(map);
+
+                document.getElementById('latitude').value = e.latlng.lat;
+                document.getElementById('longitude').value = e.latlng.lng;
 
                 fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
                     .then(res => res.json())

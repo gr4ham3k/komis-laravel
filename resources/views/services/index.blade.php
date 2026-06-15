@@ -226,17 +226,16 @@
                         @endphp
 
                         <div class="col-md-6 col-xl-4">
-                            <div class="card h-100 shadow-sm border-0">
+                            <div class="listing-card d-flex flex-column h-100">
                                 <!-- Zdjęcie usługi -->
                                 @if($service->images->first())
                                     <img
                                         src="{{ asset('storage/services/' . $service->images->first()->file_name) }}"
-                                        class="card-img-top"
-                                        style="height: 200px; object-fit: cover;"
+                                        class="listing-thumb"
                                         alt="{{ $service->title }}"
                                     >
                                 @else
-                                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <div class="listing-thumb d-flex align-items-center justify-content-center text-muted">
                                         @if($service->icon ?? false)
                                             <i class="{{ $service->icon }} fa-4x text-secondary"></i>
                                         @else
@@ -245,7 +244,7 @@
                                     </div>
                                 @endif
 
-                                <div class="card-body d-flex flex-column">
+                                <div class="p-3 d-flex flex-column flex-grow-1">
                                     <div class="mb-2">
                                         <span class="badge text-bg-info">Usługa</span>
                                     </div>

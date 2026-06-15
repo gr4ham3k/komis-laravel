@@ -33,8 +33,8 @@
             @endif
 
             <!-- Service Details -->
-            <div class="card mb-3">
-                <div class="card-body">
+            <div class="filter-panel mb-3">
+                <div class="p-4">
                     <div class="d-flex justify-content-between align-items-start">
                         <h2>{{ $service->title }}</h2>
                         <a href="{{ route('services.index') }}" class="btn btn-outline-secondary btn-sm">
@@ -87,8 +87,8 @@
                 </div>
             </div>
 
-            <div class="card mb-3">
-                <div class="card-body">
+            <div class="filter-panel mb-3">
+                <div class="p-4">
                     <h5>Lokalizacja</h5>
 
                     <iframe width="100%" height="300" style="border:0" loading="lazy" allowfullscreen
@@ -98,8 +98,8 @@
             </div>
 
             <!-- Reviews Section -->
-            <div class="card">
-                <div class="card-body">
+            <div class="filter-panel mb-3">
+                <div class="p-4">
                     <h4>Opinie klientów</h4>
 
                     @auth
@@ -157,8 +157,8 @@
 
         <div class="col-md-4">
             <!-- Price and Contact Card -->
-            <div class="card mb-3">
-                <div class="card-body">
+            <div class="filter-panel position-sticky" style="top: 88px;">
+                <div class="p-4">
                     <h3 class="text-success mb-1">{{ number_format($service->price, 2) }} PLN</h3>
                     <hr>
                     <div class="d-grid gap-2">

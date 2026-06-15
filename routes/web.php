@@ -17,7 +17,7 @@ use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'home')->name('home');
+Route::get('/', [ListingController::class, 'home'])->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');

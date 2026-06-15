@@ -23,7 +23,9 @@ class Listing extends Model
         'engine_capacity',
         'power_hp',
         'views_count',
-        'color'
+        'color',
+        'latitude',
+        'longitude'
     ];
 
     public function brand()

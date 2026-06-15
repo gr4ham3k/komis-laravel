@@ -157,15 +157,8 @@
                     </li>
                     @auth
                         @if (Auth::user()->is_admin)
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="#" role="button" data-bs-toggle="dropdown">
-                                    Panel admina
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item {{ request()->routeIs('admin.services.*') ? 'active' : '' }}" href="{{ route('admin.services.index') }}">Usługi</a></li>
-                                    <li><a class="dropdown-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">Użytkownicy</a></li>
-                                    <li><a class="dropdown-item {{ request()->routeIs('admin.dictionaries.*') ? 'active' : '' }}" href="{{ route('admin.dictionaries.index') }}">Słowniki</a></li>
-                                </ul>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}" href="{{ route('admin.services.index') }}">Panel admina</a>
                             </li>
                         @endif
                     @endauth
@@ -180,7 +173,7 @@
                     <li class="nav-item d-lg-none">
                         <a class="nav-link" href="{{ route('listings.create') }}">Dodaj ogłoszenie</a>
                     </li>
-                    
+
                     @auth
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">

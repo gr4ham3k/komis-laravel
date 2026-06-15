@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\Dictionary\TagController;
 use App\Http\Controllers\Admin\Dictionary\TransmissionController;
 use App\Http\Controllers\Admin\DictionaryController;
 use App\Http\Controllers\Admin\ServiceAdminController;
+use App\Http\Controllers\Admin\UserAdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ListingCompareController;
 use App\Http\Controllers\ListingController;
@@ -135,5 +136,13 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/', [ServiceAdminController::class, 'store'])->name('store');
         Route::patch('/{id}', [ServiceAdminController::class, 'update'])->name('update');
         Route::delete('/{id}', [ServiceAdminController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('admin/users')->name('admin.users.')->group(function () {
+        Route::get('/', [UserAdminController::class, 'index'])->name('index');
+        Route::post('/', [UserAdminController::class, 'store'])->name('store');
+        Route::patch('/{id}', [UserAdminController::class, 'update'])->name('update');
+        Route::delete('/{id}', [UserAdminController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/toggle-ban', [UserAdminController::class, 'toggleBan'])->name('toggleBan');
     });
 });

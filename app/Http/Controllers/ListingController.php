@@ -187,16 +187,100 @@ class ListingController extends Controller
         return redirect()->route('listings.images.create', $listing->id);
     }
 
+    public function edit(Listing $listing)
+    {
+        if ($listing->user_id !== Auth::id()) {
+            abort(403);
+        }
 
+        $brands = Brand::all();
+        $models = CarModel::with('brand')->get();
+        $fuels = Fuel::all();
+        $transmissions = Transmission::all();
+        $bodyTypes = BodyType::all();
+        $tags = Tag::all();
+
+        return view('listings.edit', compact('listing', 'brands', 'models', 'fuels', 'transmissions', 'bodyTypes', 'tags'));
+    }
+
+    public function update(Request $request, Listing $listing)
+    {
+        if ($listing->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string|min:20',
+            'price' => 'required|numeric|min:0',
+            'city' => 'required|string|max:255',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'year' => 'required|integer|min:1900|max:' . date('Y'),
+            'brand_id' => 'required|exists:brands,id',
+            'model_id' => 'required|exists:car_models,id',
+            'fuel_id' => 'required|exists:fuels,id',
+            'transmission_id' => 'required|exists:transmissions,id',
+            'body_type_id' => 'required|exists:body_types,id',
+            'color' => 'required|string|max:255',
+            'mileage' => 'required|integer|min:0',
+            'engine_capacity' => 'required|integer|min:50|max:10000',
+            'power_hp' => 'required|integer|min:1|max:3000',
+            'tags' => 'array'
+        ], [
+            'price.min' => 'Cena nie może być ujemna.',
+            'year.min' => 'Podaj poprawny rok produkcji.',
+            'year.max' => 'Rok produkcji nie może być większy niż bieżący.',
+            'mileage.min' => 'Przebieg nie może być ujemny.',
+            'engine_capacity.min' => 'Pojemność silnika jest zbyt mała.',
+            'engine_capacity.max' => 'Pojemność silnika jest zbyt duża.',
+            'power_hp.min' => 'Moc musi być większa od 0 KM.',
+            'power_hp.max' => 'Moc jest zbyt duża.',
+        ]);
+
+        $listing->update($validated);
+        $listing->tags()->sync($request->tags ?? []);
+
+        return redirect()->route('my.listings')
+            ->with('success', 'Ogłoszenie zostało zaktualizowane!');
+    }
+
+    public function destroy(Listing $listing)
+    {
+        if ($listing->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        foreach ($listing->images as $image) {
+            $filePath = storage_path('app/public/listings/' . $image->file_name);
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            $image->delete();
+        }
+
+        $listing->tags()->detach();
+        $listing->delete();
+
+        return redirect()->route('my.listings')
+            ->with('success', 'Ogłoszenie zostało usunięte!');
+    }
 
     public function search(Request $request)
     {
         $query = $request->q;
 
-        $brands = Brand::whereRaw("similarity(name, ?) > 0.2", [$query])
-            ->orderByRaw("similarity(name, ?) DESC", [$query])
-            ->limit(10)
-            ->get();
+        if (strlen($query) < 3) {
+            $brands = Brand::where('name', 'like', $query . '%')
+                ->orderBy('name')
+                ->limit(10)
+                ->get();
+        } else {
+            $brands = Brand::whereRaw("similarity(name, ?) > 0.2", [$query])
+                ->orderByRaw("similarity(name, ?) DESC", [$query])
+                ->limit(10)
+                ->get();
+        }
 
         return response()->json($brands);
     }
@@ -206,6 +290,14 @@ class ListingController extends Controller
     {
         $query = $request->q;
         $brandId = $request->brand_id;
+
+        if (strlen($query) < 3) {
+            return CarModel::where('brand_id', $brandId)
+                ->where('name', 'like', $query . '%')
+                ->orderBy('name')
+                ->limit(10)
+                ->get();
+        }
 
         return CarModel::where('brand_id', $brandId)
             ->whereRaw("name % ?", [$query])

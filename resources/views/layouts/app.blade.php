@@ -180,16 +180,10 @@
                                 <i class="fas fa-user"></i> {{ Auth::user()->name }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ route('user.panel') }}">Panel użytkownika</a></li>
                                 <li><a class="dropdown-item" href="{{ route('conversations.index') }}">Wiadomości</a></li>
-                                @if(Route::has('profile.show'))
-                                    <li><a class="dropdown-item" href="{{ route('profile.show') }}">Mój profil</a></li>
-                                @endif
-                                @if(Route::has('my.listings'))
-                                    <li><a class="dropdown-item" href="{{ route('my.listings') }}">Moje ogłoszenia</a></li>
-                                @endif
-                                @if(Route::has('my.services'))
-                                    <li><a class="dropdown-item" href="{{ route('my.services') }}">Moje usługi</a></li>
-                                @endif
+                                <li><a class="dropdown-item" href="{{ route('my.listings') }}">Moje ogłoszenia</a></li>
+                                <li><a class="dropdown-item" href="{{ route('my.services') }}">Moje usługi</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">

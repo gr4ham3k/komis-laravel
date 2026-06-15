@@ -81,10 +81,16 @@ class ServiceController extends Controller
         $service = Service::with('user', 'reviews.user', 'images')
             ->findOrFail($id);
 
-        // Increment views count
         $service->increment('views_count');
 
-        return view('services.show', compact('service'));
+        $userReview = null;
+        if (Auth::check()) {
+            $userReview = ServiceReview::where('service_id', $id)
+                ->where('user_id', Auth::id())
+                ->first();
+        }
+
+        return view('services.show', compact('service', 'userReview'));
     }
 
     public function create()
@@ -248,6 +254,25 @@ class ServiceController extends Controller
         ]);
 
         return back()->with('success', 'Dziękujemy za opinię!');
+    }
+
+    public function updateReview(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:1000'
+        ]);
+
+        $review = ServiceReview::where('service_id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $review->update([
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment']
+        ]);
+
+        return back()->with('success', 'Opinia została zaktualizowana!');
     }
 
     public function myServices()

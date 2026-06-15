@@ -1,8 +1,5 @@
 @extends('layouts.app')
 
-@push('styles')
-@endpush
-
 @section('content')
 
     <body class="bg-light">
@@ -92,35 +89,26 @@
                                         <label class="form-label">Marka</label>
                                         <input type="text" id="brand-search"
                                             class="form-control @error('brand_id') is-invalid @enderror"
-                                            placeholder="Wpisz markę..." autocomplete="off">
-
-                                        <input type="hidden" name="brand_id" id="brand-id">
-
+                                            placeholder="Wpisz markę..." autocomplete="off"
+                                            value="{{ old('brand_id') ? $brands->find(old('brand_id'))?->name : '' }}">
+                                        <input type="hidden" name="brand_id" id="brand-id" value="{{ old('brand_id') }}">
                                         <div id="brand-results" class="list-group"></div>
-
                                         @error('brand_id')
                                             <div class="invalid-feedback d-block">{{ $message }}</div>
                                         @enderror
-
-
                                     </div>
 
                                     <div class="col-md-6">
                                         <label class="form-label">Model</label>
-
                                         <input type="text" id="model-search"
                                             class="form-control @error('model_id') is-invalid @enderror"
-                                            placeholder="Wpisz model..." autocomplete="off">
-
-                                        <input type="hidden" name="model_id" id="model-id">
-
+                                            placeholder="Wpisz model..." autocomplete="off"
+                                            value="{{ old('model_id') ? $models->find(old('model_id'))?->name : '' }}">
+                                        <input type="hidden" name="model_id" id="model-id" value="{{ old('model_id') }}">
                                         <div id="model-results" class="list-group"></div>
-
                                         @error('model_id')
                                             <div class="invalid-feedback d-block">{{ $message }}</div>
                                         @enderror
-
-
                                     </div>
 
                                     <div class="col-md-4">
@@ -256,120 +244,104 @@
             </div>
         </div>
 
-        <script>
-            const map = L.map('map').setView([50.0413, 21.9990], 6);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
-
-            let marker;
-
-            map.on('click', function(e) {
-
-                if (marker) {
-                    map.removeLayer(marker);
-                }
-
-                marker = L.marker(e.latlng).addTo(map);
-
-                document.getElementById('latitude').value = e.latlng.lat;
-                document.getElementById('longitude').value = e.latlng.lng;
-
-                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
-                    .then(res => res.json())
-                    .then(data => {
-
-                        const city =
-                            data.address.city ||
-                            data.address.town ||
-                            data.address.village ||
-                            data.address.state ||
-                            '';
-
-                        document.getElementById('city').value = city;
-
-                        console.log("Wybrane miasto:", city);
-                    });
-            });
-        </script>
-
-        <script>
-            const search = document.getElementById('brand-search');
-            const results = document.getElementById('brand-results');
-            const brandId = document.getElementById('brand-id');
-
-            search.addEventListener('input', async () => {
-
-                if (search.value.length < 1) {
-                    results.innerHTML = '';
-                    return;
-                }
-
-                const response = await fetch(
-                    `/brands/search?q=${encodeURIComponent(search.value)}`
-                );
-
-                const brands = await response.json();
-
-                results.innerHTML = '';
-
-                brands.forEach(brand => {
-
-                    const item = document.createElement('button');
-
-                    item.type = 'button';
-                    item.className = 'list-group-item list-group-item-action';
-                    item.textContent = brand.name;
-
-                    item.onclick = () => {
-                        search.value = brand.name;
-                        brandId.value = brand.id;
-                        results.innerHTML = '';
-                    };
-
-                    results.appendChild(item);
-                });
-            });
-        </script>
-
-        <script>
-            const modelSearch = document.getElementById('model-search');
-            const modelResults = document.getElementById('model-results');
-            const modelId = document.getElementById('model-id');
-
-            modelSearch.addEventListener('input', async () => {
-
-                if (!brandId.value) return;
-
-                if (modelSearch.value.length < 2) {
-                    modelResults.innerHTML = '';
-                    return;
-                }
-
-                const response = await fetch(
-                    `/models/search?brand_id=${brandId.value}&q=${encodeURIComponent(modelSearch.value)}`
-                );
-
-                const models = await response.json();
-
-                modelResults.innerHTML = '';
-
-                models.forEach(model => {
-
-                    const item = document.createElement('button');
-                    item.type = 'button';
-                    item.className = 'list-group-item list-group-item-action';
-                    item.textContent = model.name;
-
-                    item.onclick = () => {
-                        modelSearch.value = model.name;
-                        modelId.value = model.id;
-                        modelResults.innerHTML = '';
-                    };
-
-                    modelResults.appendChild(item);
-                });
-            });
-        </script>
     @endsection
+
+@push('scripts')
+<script>
+    const map = L.map('map').setView([50.0413, 21.9990], 6);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    let marker;
+
+    map.on('click', function(e) {
+
+        if (marker) {
+            map.removeLayer(marker);
+        }
+
+        marker = L.marker(e.latlng).addTo(map);
+
+        document.getElementById('latitude').value = e.latlng.lat;
+        document.getElementById('longitude').value = e.latlng.lng;
+
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+            .then(res => res.json())
+            .then(data => {
+
+                const city =
+                    data.address.city ||
+                    data.address.town ||
+                    data.address.village ||
+                    data.address.state ||
+                    '';
+
+                document.getElementById('city').value = city;
+
+                console.log("Wybrane miasto:", city);
+            });
+    });
+</script>
+
+<script>
+    const search = document.getElementById('brand-search');
+    const results = document.getElementById('brand-results');
+    const brandId = document.getElementById('brand-id');
+
+    search.addEventListener('input', async () => {
+        if (search.value.length < 1) {
+            results.innerHTML = '';
+            return;
+        }
+        const response = await fetch(`/brands/search?q=${encodeURIComponent(search.value)}`);
+        const brands = await response.json();
+        results.innerHTML = '';
+        brands.forEach(brand => {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'list-group-item list-group-item-action';
+            item.textContent = brand.name;
+            item.onclick = () => {
+                search.value = brand.name;
+                brandId.value = brand.id;
+                results.innerHTML = '';
+                modelSearch.value = '';
+                modelId.value = '';
+                modelResults.innerHTML = '';
+            };
+            results.appendChild(item);
+        });
+    });
+</script>
+
+<script>
+    const modelSearch = document.getElementById('model-search');
+    const modelResults = document.getElementById('model-results');
+    const modelId = document.getElementById('model-id');
+
+    modelSearch.addEventListener('input', async () => {
+        if (!brandId.value) return;
+        if (modelSearch.value.length < 1) {
+            modelResults.innerHTML = '';
+            return;
+        }
+        const response = await fetch(`/models/search?brand_id=${brandId.value}&q=${encodeURIComponent(modelSearch.value)}`);
+        const models = await response.json();
+        modelResults.innerHTML = '';
+        models.forEach(model => {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'list-group-item list-group-item-action';
+            item.textContent = model.name;
+            item.onclick = () => {
+                modelSearch.value = model.name;
+                modelId.value = model.id;
+                modelResults.innerHTML = '';
+            };
+            modelResults.appendChild(item);
+        });
+    });
+</script>
+@endpush

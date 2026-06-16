@@ -290,6 +290,74 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusTxt.innerText = "Wybrano lokalizację.";
             }
 
+            const filterForm = document.querySelector('.filter-panel');
+
+            function submitFilterForm() {
+                filterForm.submit();
+            }
+
+            // Geocoding search
+            const mapSearchBtn = document.getElementById('map-search-btn');
+            const mapSearchInput = document.getElementById('map-search-input');
+
+            function performSearch() {
+                try {
+                    const query = mapSearchInput.value.trim();
+                    if (!query) return;
+
+                    statusTxt.innerText = "Szukanie...";
+                    fetch(`/geocode?q=${encodeURIComponent(query)}`)
+                        .then(res => {
+                            if (!res.ok) throw new Error("HTTP " + res.status);
+                            return res.json();
+                        })
+                        .then(data => {
+                            if (data && data.length > 0) {
+                                const lat = parseFloat(data[0].lat);
+                                const lng = parseFloat(data[0].lon);
+
+                                map.setView([lat, lng], 10);
+                                
+                                if (marker) {
+                                    marker.setLatLng([lat, lng]);
+                                } else {
+                                    marker = L.marker([lat, lng]).addTo(map);
+                                }
+
+                                latInput.value = lat.toFixed(6);
+                                lngInput.value = lng.toFixed(6);
+                                statusTxt.innerText = "Znaleziono: " + data[0].display_name.split(',')[0];
+                                clearBtn.style.display = 'inline';
+                                
+                                updateCircle(lat, lng);
+                                submitFilterForm();
+                            } else {
+                                statusTxt.innerText = "Nie znaleziono miasta.";
+                            }
+                        })
+                        .catch(err => {
+                            statusTxt.innerText = "Błąd fetch: " + err.message;
+                        });
+                } catch(err) {
+                    document.getElementById('map-status').innerText = "Błąd JS: " + err.message;
+                }
+            }
+
+            mapSearchBtn.onclick = function(e) {
+                e.preventDefault();
+                performSearch();
+            };
+            mapSearchInput.onkeydown = function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performSearch();
+                }
+            };
+            // Auto-search po 800ms od zakończenia pisania
+            mapSearchInput.oninput = function() {
+                clearTimeout(this._timer);
+                this._timer = setTimeout(() => performSearch(), 800);
+            };
             map.on('click', function(e) {
                 const lat = e.latlng.lat;
                 const lng = e.latlng.lng;
@@ -306,14 +374,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearBtn.style.display = 'inline';
                 
                 updateCircle(lat, lng);
+                submitFilterForm();
             });
-            
             radiusInput.addEventListener('change', function() {
                 if (marker) {
                     updateCircle(marker.getLatLng().lat, marker.getLatLng().lng);
+                    submitFilterForm();
                 }
             });
-
             clearBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 latInput.value = '';
@@ -322,53 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (circle) { map.removeLayer(circle); circle = null; }
                 statusTxt.innerText = "Kliknij na mapę, aby wybrać.";
                 this.style.display = 'none';
-            });
-
-            // Geocoding search
-            const mapSearchBtn = document.getElementById('map-search-btn');
-            const mapSearchInput = document.getElementById('map-search-input');
-
-            function performSearch() {
-                const query = mapSearchInput.value.trim();
-                if (!query) return;
-
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data && data.length > 0) {
-                            const lat = parseFloat(data[0].lat);
-                            const lng = parseFloat(data[0].lon);
-
-                            map.setView([lat, lng], 10);
-                            
-                            if (marker) {
-                                marker.setLatLng([lat, lng]);
-                            } else {
-                                marker = L.marker([lat, lng]).addTo(map);
-                            }
-
-                            latInput.value = lat.toFixed(6);
-                            lngInput.value = lng.toFixed(6);
-                            statusTxt.innerText = "Znaleziono: " + data[0].display_name.split(',')[0];
-                            clearBtn.style.display = 'inline';
-                            
-                            updateCircle(lat, lng);
-                        } else {
-                            alert("Nie znaleziono podanego miasta.");
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Błąd geokodowania:", err);
-                        alert("Wystąpił błąd podczas wyszukiwania.");
-                    });
-            }
-
-            mapSearchBtn.addEventListener('click', performSearch);
-            mapSearchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    performSearch();
-                }
+                submitFilterForm();
             });
         }
     });

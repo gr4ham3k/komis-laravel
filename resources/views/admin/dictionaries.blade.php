@@ -51,6 +51,9 @@
         <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
             <h2 class="mb-0">Panel admina - Słowniki</h2>
             <div class="d-flex gap-2">
+                <a href="{{ route('admin.listings.index') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-car"></i> Ogłoszenia
+                </a>
                 <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary">
                     <i class="fas fa-users"></i> Użytkownicy
                 </a>

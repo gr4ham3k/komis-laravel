@@ -225,7 +225,7 @@
                                 <!-- Zdjęcie usługi -->
                                 @if($service->images->first())
                                     <img
-                                        src="{{ asset('storage/services/' . $service->images->first()->file_name) }}"
+                                        src="{{ asset('storage/' . $service->images->first()->file_name) }}"
                                         class="listing-thumb"
                                         alt="{{ $service->title }}"
                                     >

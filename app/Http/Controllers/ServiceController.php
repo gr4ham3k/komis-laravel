@@ -28,9 +28,9 @@ class ServiceController extends Controller
         // Filtrowanie po wyszukiwaniu tekstowym
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('city', 'like', "%{$search}%");
+                $q->where('title', 'ilike', "%{$search}%")
+                    ->orWhere('description', 'ilike', "%{$search}%")
+                    ->orWhere('city', 'ilike', "%{$search}%");
             });
         }
 
@@ -237,6 +237,10 @@ class ServiceController extends Controller
         ]);
 
         $service = Service::findOrFail($id);
+
+        if ($service->user_id === Auth::id()) {
+            return back()->with('error', 'Nie możesz ocenić własnej usługi!');
+        }
 
         $existingReview = ServiceReview::where('service_id', $id)
             ->where('user_id', Auth::id())

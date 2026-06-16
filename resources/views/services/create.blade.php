@@ -112,7 +112,7 @@
 
         marker = L.marker(e.latlng).addTo(map);
 
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+        fetch(`/geocode/reverse?lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
             .then(res => res.json())
             .then(data => {
 

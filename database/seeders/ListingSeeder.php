@@ -156,6 +156,15 @@ class ListingSeeder extends Seeder
             $brand = Brand::where('name', $car['brand'])->first();
             $model = CarModel::where('name', $car['model'])->first();
 
+            $coords = [
+                'Rzeszów' => ['lat' => 50.0412, 'lng' => 21.9990],
+                'Kraków' => ['lat' => 50.0647, 'lng' => 19.9450],
+                'Warszawa' => ['lat' => 52.2297, 'lng' => 21.0122],
+                'Lublin' => ['lat' => 51.2465, 'lng' => 22.5684],
+                'Przemyśl' => ['lat' => 49.7840, 'lng' => 22.7870],
+            ];
+            $c = $coords[$car['city']] ?? ['lat' => 52.0693, 'lng' => 19.4803];
+
             $listing = Listing::create([
                 'user_id' => $user->id,
                 'brand_id' => $brand->id,
@@ -168,6 +177,8 @@ class ListingSeeder extends Seeder
                 'price' => $car['price'],
                 'status' => 'active',
                 'city' => $car['city'],
+                'latitude' => $c['lat'],
+                'longitude' => $c['lng'],
                 'color' => $car['color'],
                 'year' => $car['year'],
                 'mileage' => $car['mileage'],

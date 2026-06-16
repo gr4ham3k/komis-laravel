@@ -52,7 +52,7 @@
                                             <small class="text-white-50">{{ $listing->brand?->name }} {{ $listing->carModel?->name }}</small>
                                         </div>
                                         <img
-                                            src="{{ $listing->images->first() ? asset('storage/listings/' . $listing->images->first()->file_name) : 'https://placehold.co/260x160?text=No+Image' }}"
+                                            src="{{ $listing->images->first() ? asset('storage/' . $listing->images->first()->file_name) : 'https://placehold.co/260x160?text=No+Image' }}"
                                             alt="{{ $listing->title }}"
                                             class="img-fluid rounded"
                                             style="height: 160px; object-fit: cover;"

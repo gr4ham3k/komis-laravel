@@ -19,7 +19,6 @@ System CMS dla ogłoszeń motoryzacyjnych.
 - Panel użytkownika: moje ogłoszenia
 
 **Backend:**
-- API/listings
 - Filtrowanie (Laravel query)
 - Sortowanie + paginacja
 - Zwiększanie views_count
@@ -36,7 +35,6 @@ System CMS dla ogłoszeń motoryzacyjnych.
 - Panel admina: moderacja
 
 **Backend:**
-- API/listings/{id}
 - Komentarze do ogłoszeń
 - Chat (wiadomości user - user)
 - Panel admina: usuwanie ogłoszeń, moderacja komentarzy
@@ -51,7 +49,6 @@ System CMS dla ogłoszeń motoryzacyjnych.
 - Dodawanie usługi (formularz)
 
 **Backend:**
-- API/services
 - CRUD usług: dodaj, edytuj, usuń
 - Opinie (service_reviews)
 - Średnia ocen

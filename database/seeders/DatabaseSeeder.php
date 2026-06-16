@@ -28,8 +28,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ImageSeeder::class,
             CarDataSeeder::class,
-            ListingSeeder::class,
             TagSeeder::class,
+            ListingSeeder::class,
             ServiceSeeder::class
         ]);
 

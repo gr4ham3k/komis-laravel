@@ -11,6 +11,7 @@ use App\Models\Transmission;
 use App\Models\BodyType;
 use App\Models\User;
 use App\Models\Image;
+use App\Models\Tag;
 
 class ListingSeeder extends Seeder
 {
@@ -180,6 +181,9 @@ class ListingSeeder extends Seeder
             )->pluck('id');
 
             $listing->images()->attach($imageIds);
+
+            $tagIds = Tag::inRandomOrder()->take(rand(2, 4))->pluck('id')->toArray();
+            $listing->tags()->sync($tagIds);
         }
     }
 }

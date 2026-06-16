@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\Dictionary\TransmissionController;
 use App\Http\Controllers\Admin\DictionaryController;
 use App\Http\Controllers\Admin\ServiceAdminController;
 use App\Http\Controllers\Admin\UserAdminController;
+use App\Http\Controllers\Admin\ListingAdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ListingCompareController;
 use App\Http\Controllers\ListingController;
@@ -34,13 +35,12 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
-Route::get('/listings', [ListingController::class, 'index'])->name('listings.index');
-Route::get('/listings/create', [ListingController::class, 'create'])->name('listings.create');
-Route::post('/listings/create',[ListingController::class,'store'])->name('listings.store');
-Route::get('/listings/{listing}', [ListingController::class, 'show'])->name('listings.show');
+// Geocoding proxy routes (must be before listings resource)
+Route::get('/geocode', [ListingController::class, 'geocode']);
+Route::get('/geocode/reverse', [ListingController::class, 'reverseGeocode']);
 
-Route::get('listings/{listing}/images',[ListingImageController::class,'create'])->name('listings.images.create');
-Route::post('listings/{listing}/images',[ListingImageController::class,'store'])->name('listings.images.store');
+Route::get('/listings', [ListingController::class, 'index'])->name('listings.index');
+Route::get('/listings/{listing}', [ListingController::class, 'show'])->name('listings.show');
 
 Route::get('/brands/search', [ListingController::class, 'search']);
 Route::get('/models/search', [ListingController::class, 'searchModels']);
@@ -53,26 +53,17 @@ Route::get('/conversations/{id}', [ConversationController::class, 'show'])->name
 Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
 Route::get('/conversations/{id}/messages', [MessageController::class, 'index']);
 
-Route::get('/listings/{listing}', [ListingController::class, 'show'])
-    ->whereNumber('listing')
-    ->name('listings.show');
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
-Route::get('/services/{id}', [ServiceController::class, 'show'])
-    ->whereNumber('id')
-    ->name('services.show');
+Route::get('/services/{id}', [ServiceController::class, 'show'])->name('services.show');
 
-    Route::post('/tags',[TagController::class,'store'])->name('admin.dictionaries.tags.store');
-    Route::delete('/tags/{id}',[TagController::class,'destroy'])->name('admin.dictionaries.tags.destroy');
-    Route::patch('/tags/{id}',[TagController::class,'update'])->name('admin.dictionaries.tags.update');
+Route::post('/tags', [TagController::class, 'store'])->name('admin.dictionaries.tags.store');
+Route::delete('/tags/{id}', [TagController::class, 'destroy'])->name('admin.dictionaries.tags.destroy');
+Route::patch('/tags/{id}', [TagController::class, 'update'])->name('admin.dictionaries.tags.update');
 
 Route::prefix('compare')->name('compare.')->group(function () {
     Route::get('/', [ListingCompareController::class, 'index'])->name('index');
-    Route::post('/{listing}', [ListingCompareController::class, 'store'])
-        ->whereNumber('listing')
-        ->name('store');
-    Route::delete('/{listing}', [ListingCompareController::class, 'destroy'])
-        ->whereNumber('listing')
-        ->name('destroy');
+    Route::post('/{listing}', [ListingCompareController::class, 'store'])->name('store');
+    Route::delete('/{listing}', [ListingCompareController::class, 'destroy'])->name('destroy');
     Route::delete('/', [ListingCompareController::class, 'clear'])->name('clear');
 });
 
@@ -149,5 +140,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::patch('/{id}', [UserAdminController::class, 'update'])->name('update');
         Route::delete('/{id}', [UserAdminController::class, 'destroy'])->name('destroy');
         Route::post('/{id}/toggle-ban', [UserAdminController::class, 'toggleBan'])->name('toggleBan');
+    });
+
+    Route::prefix('admin/listings')->name('admin.listings.')->controller(ListingAdminController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/{listing}/edit', 'edit')->name('edit');
+        Route::patch('/{listing}', 'update')->name('update');
+        Route::delete('/{listing}', 'destroy')->name('destroy');
     });
 });

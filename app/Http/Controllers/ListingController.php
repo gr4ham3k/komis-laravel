@@ -13,6 +13,7 @@ use App\Models\Tag;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class ListingController extends Controller
 {
@@ -53,15 +54,33 @@ class ListingController extends Controller
             ->where('status', 'active');
 
         if ($search = trim((string) $request->input('q'))) {
-            $query->where(function ($subQuery) use ($search) {
-                $subQuery
-                    ->whereRaw("similarity(title, ?) > 0.1", [$search])
-                    ->orWhereRaw("similarity(description, ?) > 0.1", [$search])
-                    ->orWhereRaw("similarity(city, ?) > 0.1", [$search])
-                    ->orWhereRaw("similarity(color, ?) > 0.1", [$search])
-                    ->orWhereHas('brand', fn ($brandQuery) => $brandQuery->whereRaw("similarity(name, ?) > 0.1", [$search]))
-                    ->orWhereHas('carModel', fn ($modelQuery) => $modelQuery->whereRaw("similarity(name, ?) > 0.1", [$search]));
-            });
+            if (strlen($search) < 3) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery
+                        ->where('title', 'ilike', "%{$search}%")
+                        ->orWhere('description', 'ilike', "%{$search}%")
+                        ->orWhere('city', 'ilike', "%{$search}%")
+                        ->orWhere('color', 'ilike', "%{$search}%")
+                        ->orWhereHas('brand', fn ($q) => $q->where('name', 'ilike', "%{$search}%"))
+                        ->orWhereHas('carModel', fn ($q) => $q->where('name', 'ilike', "%{$search}%"));
+                });
+            } else {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery
+                        ->whereRaw("similarity(title, ?) > 0.3", [$search])
+                        ->orWhereRaw("similarity(description, ?) > 0.3", [$search])
+                        ->orWhereRaw("similarity(city, ?) > 0.3", [$search])
+                        ->orWhereRaw("similarity(color, ?) > 0.3", [$search])
+                        ->orWhereHas('brand', fn ($q) => $q->whereRaw("similarity(name, ?) > 0.3", [$search]))
+                        ->orWhereHas('carModel', fn ($q) => $q->whereRaw("similarity(name, ?) > 0.3", [$search]));
+                });
+                $query->orderByRaw("GREATEST(
+                    COALESCE(similarity(title, ?), 0),
+                    COALESCE(similarity(description, ?), 0),
+                    COALESCE(similarity(city, ?), 0),
+                    COALESCE(similarity(color, ?), 0)
+                ) DESC", [$search, $search, $search, $search]);
+            }
         }
 
         foreach (['brand_id', 'model_id', 'fuel_id', 'transmission_id', 'body_type_id'] as $field) {
@@ -279,7 +298,7 @@ class ListingController extends Controller
                 ->limit(10)
                 ->get();
         } else {
-            $brands = Brand::whereRaw("similarity(name, ?) > 0.2", [$query])
+            $brands = Brand::whereRaw("similarity(name, ?) > 0.3", [$query])
                 ->orderByRaw("similarity(name, ?) DESC", [$query])
                 ->limit(10)
                 ->get();
@@ -307,6 +326,41 @@ class ListingController extends Controller
             ->orderByRaw("similarity(name, ?) DESC", [$query])
             ->limit(10)
             ->get();
+    }
+
+    public function geocode(Request $request)
+    {
+        $query = $request->input('q');
+        if (!$query) {
+            return response()->json([]);
+        }
+
+        $url = 'https://nominatim.openstreetmap.org/search?format=json&q=' . urlencode($query) . '&limit=1';
+
+        $response = Http::withHeaders([
+            'User-Agent' => 'MotoKomis/1.0',
+            'Accept-Language' => 'pl',
+        ])->get($url);
+
+        return response()->json($response->json());
+    }
+
+    public function geocodeReverse(Request $request)
+    {
+        $lat = $request->input('lat');
+        $lon = $request->input('lon');
+        if (!$lat || !$lon) {
+            return response()->json([]);
+        }
+
+        $url = "https://nominatim.openstreetmap.org/reverse?format=json&lat={$lat}&lon={$lon}";
+
+        $response = Http::withHeaders([
+            'User-Agent' => 'MotoKomis/1.0',
+            'Accept-Language' => 'pl',
+        ])->get($url);
+
+        return response()->json($response->json());
     }
 
     private function filterOptions(): array

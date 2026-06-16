@@ -242,7 +242,7 @@
         document.getElementById('latitude').value = e.latlng.lat;
         document.getElementById('longitude').value = e.latlng.lng;
 
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+        fetch(`/geocode/reverse?lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
             .then(res => res.json())
             .then(data => {
                 const city = data.address.city || data.address.town || data.address.village || data.address.state || '';

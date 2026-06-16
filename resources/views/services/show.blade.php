@@ -10,7 +10,7 @@
                     <div class="carousel-inner">
                         @foreach ($service->images as $index => $image)
                             <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                <img src="{{ asset('storage/services/' . $image->file_name) }}" class="d-block w-100"
+                                <img src="{{ asset('storage/' . $image->file_name) }}" class="d-block w-100"
                                     style="height: 450px; object-fit: cover;">
                             </div>
                         @endforeach

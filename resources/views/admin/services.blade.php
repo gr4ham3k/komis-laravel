@@ -206,6 +206,9 @@
     <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
         <h2 class="mb-0">Panel admina - Usługi</h2>
         <div class="d-flex gap-2">
+            <a href="{{ route('admin.listings.index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-car"></i> Ogłoszenia
+            </a>
             <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary">
                 <i class="fas fa-users"></i> Użytkownicy
             </a>
@@ -265,7 +268,7 @@
                                          data-bs-toggle="tooltip"
                                          title="Kliknij aby zobaczyć zdjęcia">
                                         @if($hasImages)
-                                            <img src="{{ asset('storage/services/' . $serviceImages->first()->file_name) }}"
+                                            <img src="{{ asset('storage/' . $serviceImages->first()->file_name) }}"
                                                  alt="{{ $service->title }}">
                                         @else
                                             <i class="fas fa-screwdriver-wrench"></i>
@@ -289,7 +292,7 @@
                                                          onclick="showImageGallery({{ $service->id }}, {{ $index }})"
                                                          data-bs-toggle="tooltip"
                                                          title="{{ $image->original_name }}">
-                                                        <img src="{{ asset('storage/services/' . $image->file_name) }}"
+                                                        <img src="{{ asset('storage/' . $image->file_name) }}"
                                                              alt="mini">
                                                     </div>
                                                 @endforeach
@@ -421,10 +424,10 @@
                                 <div class="d-flex flex-wrap gap-2">
                                     @foreach($service->images as $image)
                                         <div class="text-center" style="width: 100px;">
-                                            <img src="{{ asset('storage/services/' . $image->file_name) }}"
+                                            <img src="{{ asset('storage/' . $image->file_name) }}"
                                                  class="img-thumbnail"
                                                  style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
-                                                 onclick="window.open('{{ asset('storage/services/' . $image->file_name) }}', '_blank')"
+                                                 onclick="window.open('{{ asset('storage/' . $image->file_name) }}', '_blank')"
                                                  data-bs-toggle="tooltip"
                                                  title="Kliknij aby powiększyć">
                                             <small class="text-muted d-block" style="font-size: 10px;">{{ Str::limit($image->original_name, 15) }}</small>
@@ -467,7 +470,7 @@
                         <p class="mb-2">Czy na pewno chcesz usunąć tę usługę?</p>
                         <div class="alert alert-light border">
                             @if($service->images->first())
-                                <img src="{{ asset('storage/services/' . $service->images->first()->file_name) }}"
+                                <img src="{{ asset('storage/' . $service->images->first()->file_name) }}"
                                      style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; float: left; margin-right: 12px;">
                             @else
                                 <i class="fas fa-screwdriver-wrench fa-2x text-muted float-start me-2"></i>
@@ -530,7 +533,7 @@
 const serviceImages = {!! json_encode($services->mapWithKeys(function($service) {
     return [$service->id => $service->images->map(function($image) {
         return [
-            'url' => asset('storage/services/' . $image->file_name),
+            'url' => asset('storage/' . $image->file_name),
             'name' => $image->original_name,
             'id' => $image->id
         ];

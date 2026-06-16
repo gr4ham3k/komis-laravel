@@ -162,6 +162,7 @@
                                     Panel admina
                                 </a>
                                 <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item {{ request()->routeIs('admin.listings.*') ? 'active' : '' }}" href="{{ route('admin.listings.index') }}">Ogłoszenia</a></li>
                                     <li><a class="dropdown-item {{ request()->routeIs('admin.services.*') ? 'active' : '' }}" href="{{ route('admin.services.index') }}">Usługi</a></li>
                                     <li><a class="dropdown-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">Użytkownicy</a></li>
                                     <li><a class="dropdown-item {{ request()->routeIs('admin.dictionaries.*') ? 'active' : '' }}" href="{{ route('admin.dictionaries.index') }}">Słowniki</a></li>

@@ -56,7 +56,7 @@
                                 <div class="row g-2">
                                     @forelse($service->images as $image)
                                         <div class="col-4 position-relative">
-                                            <img src="{{ asset('storage/services/' . $image->file_name) }}"
+                                            <img src="{{ asset('storage/' . $image->file_name) }}"
                                                  class="img-fluid rounded border"
                                                  style="height: 80px; width: 100%; object-fit: cover;"
                                                  alt="{{ $image->original_name }}">
@@ -139,7 +139,7 @@
 
     // Jeśli mamy zapisane miasto, spróbujemy znaleźć jego współrzędne i ustawić marker
     if (defaultCity) {
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(defaultCity)}&limit=1`)
+        fetch(`/geocode?q=${encodeURIComponent(defaultCity)}`)
             .then(res => res.json())
             .then(data => {
                 if (data && data.length > 0) {
@@ -162,7 +162,7 @@
 
         marker = L.marker(e.latlng).addTo(map);
 
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+        fetch(`/geocode/reverse?lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
             .then(res => res.json())
             .then(data => {
                 const city = data.address.city ||

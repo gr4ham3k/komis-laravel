@@ -76,7 +76,6 @@ Aplikacja pełni funkcję platformy do wystawiania i przeglądania ogłoszeń mo
 - **Profil użytkownika**: edycja danych (name, email) z walidacją unique, zmiana hasła (current_password, new password + confirmation)
 - **Middleware**: `admin` alias w bootstrap/app.php, sprawdza `$user->is_admin`, 403 dla nieautoryzowanych, redirect na login dla gości
 - **Obsługa banów**: pole `is_banned` w tabeli users, blokada logowania, admin może toggle ban (zabezpieczenie przed banowaniem siebie)
-- **Sesje**: oparte o bazę danych (SESSION_DRIVER=database)
 
 
 ### Wspólne funkcjonalności

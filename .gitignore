@@ -24,3 +24,9 @@ Homestead.yaml
 Thumbs.db
 
 .seeded
+
+# Storage uploaded files
+/storage/app/public/listings/
+/storage/app/public/services/
+*.docx
+generate_docs.py

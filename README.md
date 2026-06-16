@@ -29,11 +29,12 @@ Aplikacja pełni funkcję platformy do wystawiania i przeglądania ogłoszeń mo
 | **Laravel** | 13.15.0 | Framework backendowy MVC |
 | **PHP** | ^8.4 | Język programowania |
 | **Docker** | 28.x | Kontenery |
+| **Docker Compose** | 2.x | Uruchamianie projektu |
 | **Bootstrap** | 5.3.0 | Frontend – stylowanie, responsywność, komponenty UI |
 | **PostgreSQL** |18.4 | Relacyjna baza danych (z obsługą pg_trgm) |
 | **Leaflet.js** | 1.9.4 | Mapy interaktywne (OpenStreetMap) |
 | **Google Maps** | – | Osadzanie map w widokach |
-| **Docker Compose** | – | Uruchamianie projektu |
+
 
 
 ## Opis funkcjonalności

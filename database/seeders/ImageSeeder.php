@@ -14,6 +14,16 @@ class ImageSeeder extends Seeder
         $images = [
             'bmw1.jpg',
             'bmw2.jpg',
+            'audi1.jpg',
+            'audi2.jpg',
+            'merc1.jpg',
+            'merc2.jpg',
+            'golf1.jpg',
+            'golf2.jpg',
+            'rav4_1.jpg',
+            'rav4_2.jpg',
+            'octavia1.jpg',
+            'octavia2.jpg',
         ];
 
         foreach ($images as $img) {

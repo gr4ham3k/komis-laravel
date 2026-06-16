@@ -7,6 +7,7 @@ use App\Models\Listing;
 use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class ListingImageController extends Controller
 {
@@ -26,9 +27,12 @@ class ListingImageController extends Controller
             $uuid = (string) Str::uuid();
             $extension = $imageFile->getClientOriginalExtension();
 
-            $fileName = $uuid . '.' . $extension;
+            $fileName = 'listings/' . $uuid . '.' . $extension;
 
-            $imageFile->storeAs('listings', $fileName, 'public');
+            Storage::disk('public')->put(
+                $fileName,
+                file_get_contents($imageFile)
+            );
 
             $image = Image::create([
                 'file_name' => $fileName,

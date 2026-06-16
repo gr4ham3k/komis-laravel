@@ -17,18 +17,18 @@
     <div class="container py-5">
         <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
             <div>
-                <h1 class="h3 mb-1">Porownanie ogloszen</h1>
+                <h1 class="h3 mb-1">Porównanie ogłoszeń</h1>
                 <p class="text-muted mb-0">
                 </p>
             </div>
 
             <div class="d-flex gap-2">
-                <a href="{{ route('listings.index') }}" class="btn btn-outline-secondary">Wroc do ogloszen</a>
+                <a href="{{ route('listings.index') }}" class="btn btn-outline-secondary">Wróć do ogłoszeń</a>
                 @if($listings->isNotEmpty())
                     <form method="POST" action="{{ route('compare.clear') }}">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-outline-danger">Wyczysc porownanie</button>
+                        <button type="submit" class="btn btn-outline-danger">Wyczyść porównanie</button>
                     </form>
                 @endif
             </div>
@@ -36,7 +36,7 @@
 
         @if($listings->isEmpty())
             <div class="alert alert-info">
-                Lista porownania jest pusta. Wroc do ogloszen i dodaj auta do porownania.
+                Lista porównania jest pusta. Wróć do ogłoszeń i dodaj auta do porównania.
             </div>
         @else
             <div class="table-responsive">

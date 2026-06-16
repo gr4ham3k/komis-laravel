@@ -9,7 +9,7 @@
                         <div class="text-center mb-4">
                             <div class="badge text-bg-dark px-3 py-2 mb-3">MotoKomis</div>
                             <h1 class="h3 mb-2">Logowanie</h1>
-                            <p class="text-muted mb-0">Zaloguj sie, aby korzystac z pelnej funkcjonalnosci konta.</p>
+                            <p class="text-muted mb-0">Zaloguj się, aby korzystać z pełnej funkcjonalności konta.</p>
                         </div>
 
                         @if(session('error'))
@@ -37,7 +37,7 @@
                                     type="email"
                                     name="email"
                                     class="form-control form-control-lg"
-                                    placeholder="Enter email"
+                                    placeholder="Email"
                                     value="{{ old('email') }}"
                                     required
                                 >
@@ -49,7 +49,7 @@
                                     type="password"
                                     name="password"
                                     class="form-control form-control-lg"
-                                    placeholder="Enter password"
+                                    placeholder="Hasło"
                                     required
                                 >
                             </div>
@@ -59,8 +59,8 @@
                             </div>
 
                             <p class="text-center text-muted mt-4 mb-0">
-                                Don't have an account?
-                                <a href="{{ route('register') }}" class="fw-bold text-decoration-none">Register</a>
+                                Nie masz konta?
+                                <a href="{{ route('register') }}" class="fw-bold text-decoration-none">Rejestracja</a>
                             </p>
                         </form>
                     </div>

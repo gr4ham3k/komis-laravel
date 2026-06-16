@@ -46,7 +46,7 @@
                         <tr>
                             <td style="width: 80px;">
                                 @if ($listing->images->first())
-                                    <img src="{{ asset('storage/listings/' . $listing->images->first()->file_name) }}"
+                                    <img src="{{ asset('storage/' . $listing->images->first()->file_name) }}"
                                          class="rounded"
                                          style="width: 60px; height: 40px; object-fit: cover;"
                                          alt="">

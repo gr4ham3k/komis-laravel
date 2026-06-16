@@ -111,7 +111,7 @@
             </div>
 
             <aside class="col-lg-4">
-                <div class="filter-panel p-4 position-sticky" style="top: 88px;">
+                <div class="filter-panel p-4">
                     <p>
                         Status:
                         @if ($listing->status === 'active')

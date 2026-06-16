@@ -1,11 +1,7 @@
-{{-- resources/views/services/index.blade.php --}}
+
 @extends('layouts.app')
 
 @section('content')
-    @php
-        // Możesz dodać podobną logikę sesji dla usług jeśli potrzebujesz porównywania
-        // $compareServiceIds = session('compare_services', []);
-    @endphp
 
     <div class="container py-5">
         <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
@@ -25,9 +21,8 @@
         </div>
 
         <div class="row g-4">
-            <!-- SIDEBAR Z FILTRAMI - LEWA STRONA -->
             <div class="col-lg-3">
-                <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                <div class="card shadow-sm border-0" style="top: 20px;">
                     <div class="card-body">
                         <h5 class="card-title mb-3">
                             <i class="fas fa-filter me-2"></i>Filtry

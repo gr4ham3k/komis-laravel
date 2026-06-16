@@ -91,9 +91,11 @@ Aplikacja pełni funkcję platformy do wystawiania i przeglądania ogłoszeń mo
 
 ### Wymagania
 
+- Laravel 13x
+- Docker 28.x
 - PHP ^8.4 z rozszerzeniami: `pgsql`, `mbstring`, `xml`, `curl`, `gd`, `fileinfo`
-- Composer 2.x
-- PostgreSQL 15+ (lub SQLite)
+- Docker Compose 2.x
+- PostgreSQL 15+
 - Rozszerzenie PostgreSQL `pg_trgm`
 
 ### Krok po kroku
@@ -127,6 +129,18 @@ Aplikacja pełni funkcję platformy do wystawiania i przeglądania ogłoszeń mo
    ```bash
    docker compose run --rm web php artisan key:generate
    ```
+
+## Kierunki rozwoju
+
+- Powiadomienia e-mail o nowych wiadomościach na czacie oraz odpowiedziach na ogłoszenia i usługi.
+- System ulubionych ogłoszeń i usług, umożliwiający zapisywanie interesujących ofert przez użytkowników.
+- Powiadomienia w czasie rzeczywistym (WebSockets / Laravel Reverb) dla czatu i nowych aktywności.
+- Panel statystyk użytkownika z wykresami wyświetleń oraz zainteresowania ogłoszeniami.
+- System zgłaszania nieodpowiednich treści wraz z panelem moderacji dla administratorów.
+- Obsługa materiałów wideo obok zdjęć w ogłoszeniach i usługach.
+- Integracja z zewnętrznymi API motoryzacyjnymi, umożliwiająca automatyczne pobieranie danych pojazdu na podstawie numeru VIN.
+- Zaawansowane wyszukiwanie lokalizacji z filtrowaniem po promieniu od wskazanego punktu na mapie.
+- REST API umożliwiające integrację z aplikacjami mobilnymi i zewnętrznymi systemami.
 
 ## Przebieg użycia aplikacji
 

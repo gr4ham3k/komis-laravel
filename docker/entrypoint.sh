@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 if [ ! -f "/var/www/.env" ]; then
   echo "Creating .env from .env.example..."
   cp /var/www/.env.example /var/www/.env

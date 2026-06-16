@@ -27,7 +27,7 @@ System CMS dla ogłoszeń motoryzacyjnych.
 - Panel usera (CRUD ogłoszeń)
 
 ### Jakub Czarnik
-**Moduł:** Widok ogłoszenia + komentarze + chat + panel admina
+**Moduł:** Widok ogłoszenia + chat + panel admina (słowniki) + dodawanie ogłoszeń
 
 **Frontend:**
 - Strona pojedynczego auta: galeria zdjęć, dane auta, opis

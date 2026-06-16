@@ -1,59 +1,165 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Dokumentacja projektu – Komis Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+System CMS dla ogłoszeń motoryzacyjnych.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Przeznaczenie aplikacji
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Aplikacja pełni funkcję platformy do wystawiania i przeglądania ogłoszeń motoryzacyjnych (sprzedaż samochodów) oraz usług warsztatowych (mechanika, detailing, naprawy). Umożliwia:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Przeglądanie ogłoszeń aut z zaawansowanym filtrowaniem i wyszukiwaniem
+- Dodawanie i zarządzanie ogłoszeniami przez użytkowników
+- Wystawianie usług motoryzacyjnych z opiniami i ocenami
+- Komunikację między użytkownikami przez wbudowany czat
+- Zarządzanie treścią przez panel administratora
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+# DIAGRAM ERD
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+![Diagram ERD](ERD.png "ERD")
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Użyte technologie
 
-### Premium Partners
+| Technologia | Wersja | Zastosowanie |
+|-------------|--------|--------------|
+| **Laravel** | 13.15.0 | Framework backendowy MVC |
+| **PHP** | ^8.4 | Język programowania |
+| **Bootstrap** | 5.3.0 | Frontend – stylowanie, responsywność, komponenty UI |
+| **PostgreSQL** |18.4 | Relacyjna baza danych (z obsługą pg_trgm) |
+| **MySQL** | – | Alternatywna baza danych (obsługiwana przez config) |
+| **Leaflet.js** | 1.9.4 | Mapy interaktywne (OpenStreetMap) |
+| **Google Maps** | – | Osadzanie map w widokach |
+| **Composer** | – | Menadżer zależności PHP |
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
 
-## Contributing
+## Opis funkcjonalności
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Moduł Rafała Burbeło – Strona główna, listingi, panel admina/user
 
-## Code of Conduct
+- **Strona główna**: lista polecanych ogłoszeń (6 najnowszych), popularne tagi, statystyki (liczba ogłoszeń, marek, usług)
+- **Lista ogłoszeń**: widok grid z paginacją (10/12/20 na stronę)
+- **Filtrowanie**: marka, model, cena (od-do), rok, paliwo, skrzynia biegów, nadwozie, miasto, lokalizacja (mapa, współrzędne), tagi, przebieg, moc, pojemność silnika
+- **Wyszukiwanie**: pełnotekstowe z użyciem pg_trgm (similarity) po tytule, opisie, mieście, kolorze, marce, modelu
+- **Sortowanie**: cena (ros./malej.), rok, przebieg, popularność, najnowsze
+- **Panel admina**: zarządzanie użytkownikami (CRUD, banowanie – toggleBan, zabezpieczenie przed banowaniem siebie)
+- **Panel użytkownika**: lista własnych ogłoszeń z możliwością edycji/usunięcia, dashboard ze statystykami
+- **Autocomplete marek/modeli**: wyszukiwanie przez similarity() pg_trgm w formularzu dodawania/edycji ogłoszenia
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-## Security Vulnerabilities
+### Moduł Jakuba Czarnika – Widok ogłoszenia, komentarze, chat, admin
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **Widok ogłoszenia**: galeria zdjęć (Bootstrap carousel), dane techniczne auta (marka, model, rok, paliwo, skrzynia, moc, pojemność, przebieg, kolor), opis, cena, lokalizacja na mapie Google
+- **Dodawanie ogłoszeń**: dodawanie ogłoszeń o sprzedaży samochodu
+- **Chat**: konwersacje między użytkownikami, lista konwersacji z licznikiem nieprzeczytanych wiadomości, obsługa zarówno listingów jak i usług, oznaczenie wiadomości jako przeczytane (is_read, visit_time)
+- **Panel admina**: słowniki (dodawanie modeli, marek, tagów itp.)
 
-## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Moduł Jakuba Dobka – Serwisy (usługi motoryzacyjne)
+
+- **Lista usług**: widok kafelkowy z paginacją (12/str)
+- **Filtrowanie**: miasto (select z listy miast), cena (min/max), wyszukiwanie tekstowe (tytuł, opis, miasto)
+- **Sortowanie**: cena (ros./malej.), data, popularność (views_count), najlepiej oceniane (withAvg)
+- **Widok usługi**: karuzela zdjęć, opis, cena, średnia ocen (gwiazdki full/half/empty), liczba opinii, miasto, data, wystawiający, mapa Google, licznik wyświetleń
+- **CRUD**: create/store (z mapą Leaflet + reverse geocoding Nominatim), edit/update (z zarządzaniem zdjęciami), destroy (usunięcie plików z dysku)
+- **Opinie**: addReview/updateReview (1 opinia na użytkownika na usługę, duplicate check), rating 1-5, comment max 1000 znaków
+- **Średnia ocen**: metoda `averageRating()` w modelu, sortowanie `best_rated` przez `withAvg()`
+
+### Moduł Vladyslava Denysiuka – Autoryzacja i użytkownicy
+
+- **Rejestracja**: walidacja (name, email unique, password min:8 + confirmed), hash bcrypt, przekierowanie na login z flash message
+- **Logowanie**: walidacja credentials, regeneracja sesji, obsługa banned (Auth::logout + session invalidate + komunikat)
+- **Wylogowanie**: destrukcja sesji, regeneracja tokena CSRF
+- **Profil użytkownika**: edycja danych (name, email) z walidacją unique, zmiana hasła (current_password, new password + confirmation)
+- **Middleware**: `admin` alias w bootstrap/app.php, sprawdza `$user->is_admin`, 403 dla nieautoryzowanych, redirect na login dla gości
+- **Obsługa banów**: pole `is_banned` w tabeli users, blokada logowania, admin może toggle ban (zabezpieczenie przed banowaniem siebie)
+- **Sesje**: oparte o bazę danych (SESSION_DRIVER=database)
+
+
+### Wspólne funkcjonalności
+
+- **Walidacja**: backend (`$request->validate()`) z polskimi komunikatami błędów; frontend (`is-invalid`, `@error`, `required`)
+- **Responsywność**: Bootstrap 5.3 grid (col-lg, col-md, col-), flex, table-responsive, navbar z togglerem
+- **Obsługa błędów HTTP**: abort(403), abort(404), findOrFail(), firstOrFail(), flash messages (success/error)
+- **ORM**: Eloquent z relacjami (belongsTo, hasMany, belongsToMany), query builder z bind parameters (whereRaw)
+- **Seedery**: DatabaseSeeder uruchamia ImageSeeder (z rzeczywistymi zdjęciami z `database/seed-images/`), CarDataSeeder, ListingSeeder, TagSeeder, ServiceSeeder
+
+
+## Instrukcja uruchomienia aplikacji
+
+### Wymagania
+
+- PHP ^8.4 z rozszerzeniami: `pgsql`, `mbstring`, `xml`, `curl`, `gd`, `fileinfo`
+- Composer 2.x
+- PostgreSQL 15+ (lub SQLite)
+- Rozszerzenie PostgreSQL `pg_trgm`
+
+### Krok po kroku
+
+1. **Klonowanie repozytorium**
+   ```bash
+   git clone <adres-repozytorium>
+   cd Komis-Laravel
+   ```
+
+2. **Uruchomienie projektu**
+   ```bash
+   docker compose up
+   ```
+
+3. **Konfiguracja środowiska**
+   ```bash
+   cp .env.example .env
+   ```
+   Edytuj `.env`:
+   ```
+   DB_CONNECTION=pgsql
+   DB_HOST=db
+   DB_PORT=5432
+   DB_DATABASE=laravel
+   DB_USERNAME=laravel
+   DB_PASSWORD=secret
+   ```
+
+4. **Generowanie klucza**
+   ```bash
+   docker compose run --rm web php artisan key:generate
+   ```
+
+## Przebieg użycia aplikacji
+
+### Scenariusz 1: Sprzedawca wystawia ogłoszenie, kupujący pisze na czacie
+
+1. **Rejestracja** – nowy użytkownik wypełnia formularz (name, email, password + confirmation)
+![alt text](screens/rejestracja.png)
+2. **Logowanie** – system regeneruje sesję, sprawdza czy nie jest zbanowany
+![alt text](screens/logowanie.png)
+3. **Dodanie ogłoszenia** – użytkownik wypełnia formularz: marka (autocomplete), model, rok, paliwo, skrzynia, nadwozie, cena, przebieg, moc, pojemność, kolor, lokalizacja (mapa), tagi
+![alt text](screens/dodawanie.png)
+4. **Dodanie zdjęć** – po zapisie przekierowanie do strony dodawania zdjęć
+![alt text](screens/dodawanie_zdj.png)
+5. **Kupujący szuka** – używa filtrów (marka, model, cena, paliwo), sortuje, paginacja
+![alt text](screens/szuka.png)
+6. **Widok ogłoszenia** – galeria, dane techniczne, opis, cena, mapa Google
+![alt text](screens/widok.png)
+7. **Czat** – kupujący klika "Napisz do sprzedawcy", system tworzy konwersację
+![alt text](screens/kupujacy_pisze.png)
+8. **Sprzedawca odpowiada** – widzi nową wiadomość w panelu konwersacji
+![alt text](screens/sprzedawca_odpowiada.png)
+### Scenariusz 2: Mechanik dodaje usługę, klient wystawia opinię
+
+1. **Dodanie usługi** – mechanik wypełnia formularz, wybiera lokalizację na mapie Leaflet (auto-geokodowanie), dodaje zdjęcia
+![alt text](screens/dodanie_uslugi.png)
+2. **Przeglądanie** – klient filtruje po mieście i cenie, sortuje po ocenie
+![alt text](screens/klient_szuka_uslugi_filtry.png)
+3. **Widok usługi** – karuzela zdjęć, opis, cena, średnia ocen, opinie, mapa
+![alt text](screens/widok_uslugi.png)
+4. **Kontakt** – "Napisz do usługodawcy" przez czat
+![alt text](screens/pisze_do_uslugodawcy.png)
+5. **Opinia** – klient wystawia ocenę (1-5) i komentarz, średnia automatycznie aktualizowana
+![alt text](screens/opinia.png)
+6. **Panel usługodawcy** – "Moje usługi" z liczbą wyświetleń, edycja/usuwanie
+![alt text](screens/panel.png)

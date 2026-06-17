@@ -40,13 +40,13 @@ Route::get('/geocode', [ListingController::class, 'geocode']);
 Route::get('/geocode/reverse', [ListingController::class, 'reverseGeocode']);
 
 Route::get('/listings', [ListingController::class, 'index'])->name('listings.index');
-Route::get('/listings/{listing}', [ListingController::class, 'show'])->name('listings.show');
+Route::get('/listings/{listing}', [ListingController::class, 'show'])
+    ->whereNumber('listing')
+    ->name('listings.show');
 
 Route::get('/brands/search', [ListingController::class, 'search']);
 Route::get('/models/search', [ListingController::class, 'searchModels']);
 
-Route::get('/chat/start/{listingId}', [ConversationController::class, 'createOrOpenConversation'])->name('conversations.start');
-Route::get('/chat/start-service/{serviceId}', [ConversationController::class, 'createOrOpenServiceConversation'])->name('conversations.startService');
 Route::get('/conversations', [ConversationController::class, 'index'])->name('conversations.index');
 Route::get('/conversations/{id}', [ConversationController::class, 'show'])->name('conversations.show');
 
@@ -71,8 +71,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/listings/create', [ListingController::class, 'create'])->name('listings.create');
     Route::post('/listings/create', [ListingController::class, 'store'])->name('listings.store');
 
-    Route::get('listings/{listing}/images', [ListingImageController::class, 'create'])->name('listings.images.create');
-    Route::post('listings/{listing}/images', [ListingImageController::class, 'store'])->name('listings.images.store');
+    Route::get('/listings/{listing}/images/create', [ListingImageController::class, 'create'])
+        ->name('listings.images.create');
+
+    Route::post('/listings/{listing}/images', [ListingImageController::class, 'store'])
+        ->name('listings.images.store');
+
+    Route::get('/listings/{listing}/images', [ListingImageController::class, 'edit'])
+        ->name('listings.images.edit');
+
+    Route::delete('/images/{image}', [ListingImageController::class, 'destroy'])
+        ->name('images.destroy');
 
     Route::get('/chat/start/{listingId}', [ConversationController::class, 'createOrOpenConversation'])->name('conversations.start');
     Route::get('/chat/start-service/{serviceId}', [ConversationController::class, 'createOrOpenServiceConversation'])->name('conversations.startService');

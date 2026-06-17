@@ -22,12 +22,7 @@ while ! nc -z db 5432 2>/dev/null; do sleep 1; done
 echo "DB ready!"
 
 php artisan migrate --force
-
-if [ ! -f "/var/www/.seeded" ]; then
-  echo "Seeding database..."
-  php artisan db:seed --force
-  touch /var/www/.seeded
-fi
+php artisan db:seed --force
 
 php artisan storage:link --force 2>/dev/null || true
 

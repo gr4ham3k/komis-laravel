@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Listing;
 use App\Models\Service;
 use App\Models\Conversation;
@@ -12,14 +10,21 @@ use Illuminate\Support\Facades\Auth;
 
 class ConversationController extends Controller
 {
+
     public function createOrOpenConversation($listingId)
     {
         $listing = Listing::findOrFail($listingId);
 
-        $conversation = Conversation::firstOrCreate([
-            'listing_id' => $listingId,
-            'user2_id' => Auth::id(),
-        ]);
+        $conversation = Conversation::where('listing_id', $listingId)
+            ->where('user2_id', Auth::id())
+            ->first();
+
+        if (!$conversation) {
+            $conversation = Conversation::create([
+                'listing_id' => $listingId,
+                'user2_id' => Auth::id(),
+            ]);
+        }
 
         return redirect()->route('conversations.show', $conversation->id);
     }
@@ -28,10 +33,16 @@ class ConversationController extends Controller
     {
         $service = Service::findOrFail($serviceId);
 
-        $conversation = Conversation::firstOrCreate([
-            'service_id' => $serviceId,
-            'user2_id' => Auth::id(),
-        ]);
+        $conversation = Conversation::where('service_id', $serviceId)
+            ->where('user2_id', Auth::id())
+            ->first();
+
+        if (!$conversation) {
+            $conversation = Conversation::create([
+                'service_id' => $serviceId,
+                'user2_id' => Auth::id(),
+            ]);
+        }
 
         return redirect()->route('conversations.show', $conversation->id);
     }
@@ -48,15 +59,17 @@ class ConversationController extends Controller
                 $q->where('user_id', $userId);
             })
             ->with([
-                'listing',
-                'service',
+                'listing.user',
+                'service.user',
                 'messages' => function ($q) {
-                    $q->latest();
+                    $q->latest()->limit(1);
                 }
             ])
             ->withCount(['messages as unread_count' => function ($q) use ($userId) {
-                $q->where('sender_id', '!=', $userId)->where('is_read', false);
+                $q->where('sender_id', '!=', $userId)
+                    ->where('is_read', false);
             }])
+            ->latest()
             ->get();
 
         return view('conversations.index', compact('conversations'));
@@ -66,6 +79,16 @@ class ConversationController extends Controller
     {
         $userId = Auth::id();
 
+        $conversation = Conversation::findOrFail($id);
+
+        if (
+            $conversation->user2_id !== $userId &&
+            optional($conversation->listing)->user_id !== $userId &&
+            optional($conversation->service)->user_id !== $userId
+        ) {
+            abort(403);
+        }
+
         $conversations = Conversation::where('user2_id', $userId)
             ->orWhereHas('listing', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
@@ -73,20 +96,37 @@ class ConversationController extends Controller
             ->orWhereHas('service', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
             })
-            ->with(['messages', 'listing', 'service'])
+            ->with([
+                'listing.user',
+                'service.user',
+                'messages' => fn($q) => $q->latest()->limit(1)
+            ])
             ->withCount(['messages as unread_count' => function ($q) use ($userId) {
-                $q->where('sender_id', '!=', $userId)->where('is_read', false);
+                $q->where('sender_id', '!=', $userId)
+                    ->where('is_read', false);
             }])
+            ->latest()
             ->get();
 
-        $conversationActive = Conversation::with(['messages.sender', 'listing', 'service'])
-            ->findOrFail($id);
+        $messages = Message::where('conversation_id', $id)
+            ->with('sender')
+            ->orderBy('created_at', 'asc')
+            ->limit(50)
+            ->get();
+
+        $conversation->setRelation('messages', $messages);
 
         Message::where('conversation_id', $id)
             ->where('sender_id', '!=', $userId)
             ->where('is_read', false)
-            ->update(['is_read' => true, 'visit_time' => now()]);
+            ->update([
+                'is_read' => true,
+                'visit_time' => now()
+            ]);
 
-        return view('conversations.index', compact('conversations', 'conversationActive'));
+        return view('conversations.index', [
+            'conversations' => $conversations,
+            'conversationActive' => $conversation
+        ]);
     }
 }

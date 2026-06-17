@@ -50,4 +50,20 @@ class ListingImageController extends Controller
         return redirect()->route('listings.show', $listing->id)
             ->with('success', 'Zdjęcia dodane!');
     }
+
+    public function edit(Listing $listing)
+    {
+        $listing->load('images');
+
+        return view('listings.images.edit', compact('listing'));
+    }
+
+    public function destroy(Image $image)
+    {
+        Storage::disk('public')->delete($image->file_name);
+
+        $image->delete();
+
+        return back()->with('success', 'Zdjęcie usunięte');
+    }
 }

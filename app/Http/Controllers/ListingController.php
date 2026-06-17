@@ -93,7 +93,7 @@ class ListingController extends Controller
             $lat = (float) $request->input('lat');
             $lng = (float) $request->input('lng');
             $radius = (int) $request->input('radius', 50); // Default to 50km if not provided
-            
+
             if ($radius > 0) {
                 $query->whereNotNull('latitude')->whereRaw(
                     "(6371 * acos(least(greatest(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)), -1.0), 1.0))) <= ?",

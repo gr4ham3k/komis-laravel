@@ -33,21 +33,19 @@
                         <div class="carousel-inner">
                             @foreach ($listing->images as $index => $image)
                                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                    <img
-                                        src="{{ asset('storage/' . $image->file_name) }}"
-                                        class="d-block w-100 rounded"
-                                        style="height: 450px; object-fit: cover;"
-                                        alt="{{ $listing->title }}"
-                                    >
+                                    <img src="{{ asset('storage/' . $image->file_name) }}" class="d-block w-100 rounded"
+                                        style="height: 450px; object-fit: cover;" alt="{{ $listing->title }}">
                                 </div>
                             @endforeach
                         </div>
 
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample"
+                            data-bs-slide="prev">
                             <span class="carousel-control-prev-icon"></span>
                         </button>
 
-                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample"
+                            data-bs-slide="next">
                             <span class="carousel-control-next-icon"></span>
                         </button>
                     </div>
@@ -81,16 +79,19 @@
                         <div class="col-md-6">
                             <p><i class="fas fa-car-side me-1"></i> <strong>Marka:</strong> {{ $listing->brand->name }}</p>
                             <p><i class="fas fa-car me-1"></i> <strong>Model:</strong> {{ $listing->carModel->name }}</p>
-                            <p><i class="fas fa-table-cells-large me-1"></i> <strong>Nadwozie:</strong> {{ $listing->bodyType->name }}</p>
+                            <p><i class="fas fa-table-cells-large me-1"></i> <strong>Nadwozie:</strong>
+                                {{ $listing->bodyType->name }}</p>
                             <p><i class="fas fa-location-dot me-1"></i> <strong>Miasto:</strong> {{ $listing->city }}</p>
                             <p><i class="fas fa-calendar me-1"></i> <strong>Rok:</strong> {{ $listing->year }}</p>
                             <p><i class="fas fa-road me-1"></i> <strong>Przebieg:</strong> {{ $listing->mileage }} km</p>
                         </div>
 
                         <div class="col-md-6">
-                            <p><i class="fas fa-gears me-1"></i> <strong>Skrzynia biegów:</strong> {{ $listing->transmission->name }}</p>
+                            <p><i class="fas fa-gears me-1"></i> <strong>Skrzynia biegów:</strong>
+                                {{ $listing->transmission->name }}</p>
                             <p><i class="fas fa-gauge-high me-1"></i> <strong>Moc:</strong> {{ $listing->power_hp }} KM</p>
-                            <p><i class="fas fa-wrench me-1"></i> <strong>Pojemność silnika:</strong> {{ $listing->engine_capacity }} cm³</p>
+                            <p><i class="fas fa-wrench me-1"></i> <strong>Pojemność silnika:</strong>
+                                {{ $listing->engine_capacity }} cm³</p>
                             <p><i class="fas fa-palette me-1"></i> <strong>Kolor:</strong> {{ $listing->color }}</p>
                             <p><i class="fas fa-gas-pump me-1"></i> <strong>Paliwo:</strong> {{ $listing->fuel->name }}</p>
                         </div>
@@ -99,14 +100,7 @@
 
                 <div class="filter-panel p-4 mt-3">
                     <h2 class="h5">Lokalizacja</h2>
-                    <iframe
-                        width="100%"
-                        height="300"
-                        style="border:0"
-                        loading="lazy"
-                        allowfullscreen
-                        src="https://www.google.com/maps?q={{ urlencode($listing->city) }}&output=embed">
-                    </iframe>
+                    <div id="map" style="height: 300px; border-radius: 8px;"></div>
                 </div>
             </div>
 
@@ -125,13 +119,40 @@
                     <hr>
                     <p><strong>Sprzedający:</strong> {{ $listing->user->name }}</p>
 
-                    <form method="get" action="{{ route('conversations.start', $listing) }}">
-                        <button class="btn btn-mk w-100">
-                            <i class="fas fa-envelope me-1"></i> Napisz do sprzedającego
-                        </button>
-                    </form>
+                    @auth
+                        @if (auth()->id() === $listing->user_id)
+                            <a href="{{ route('listings.edit', $listing) }}" class="btn btn-mk w-100">
+                                <i class="fas fa-pen me-1"></i> Edytuj ogłoszenie
+                            </a>
+                        @else
+                            <form method="get" action="{{ route('conversations.start', $listing) }}">
+                                <button class="btn btn-mk w-100">
+                                    <i class="fas fa-envelope me-1"></i> Napisz do sprzedającego
+                                </button>
+                            </form>
+                        @endif
+                    @endauth
                 </div>
             </aside>
         </div>
     </div>
+@push('scripts')
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const map = L.map('map').setView(
+            [{{ $listing->latitude }}, {{ $listing->longitude }}],
+            12
+        );
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        L.marker([{{ $listing->latitude }}, {{ $listing->longitude }}])
+            .addTo(map)
+            .bindPopup("{{ $listing->city }}")
+            .openPopup();
+    });
+</script>
+@endpush
 @endsection

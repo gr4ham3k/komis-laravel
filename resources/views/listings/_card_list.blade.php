@@ -1,6 +1,14 @@
 @php
     $compareIds = session('compare_listings', []);
     $isCompared = in_array($listing->id, $compareIds, true);
+    $specs = [
+        $listing->year ? '<i class="far fa-calendar-alt me-1"></i>'.$listing->year : null,
+        $listing->mileage ? '<i class="fas fa-tachometer-alt me-1"></i>'.number_format($listing->mileage, 0, ',', ' ').' km' : null,
+        $listing->fuel?->name ? '<i class="fas fa-gas-pump me-1"></i>'.$listing->fuel->name : null,
+        $listing->engine_capacity ? '<i class="fas fa-microchip me-1"></i>'.$listing->engine_capacity.' cm³' : null,
+        $listing->power_hp ? '<i class="fas fa-horse-head me-1"></i>'.$listing->power_hp.' KM' : null,
+        $listing->transmission?->name ? '<i class="fas fa-cog me-1"></i>'.$listing->transmission->name : null,
+    ];
 @endphp
 
 <div class="listing-card d-flex flex-row h-100">
@@ -37,12 +45,9 @@
         </p>
 
         <div class="spec-chips-grid mb-2">
-            <span class="spec-chip">@if($listing->year)<i class="far fa-calendar-alt me-1"></i>{{ $listing->year }}@endif</span>
-            <span class="spec-chip">@if($listing->mileage)<i class="fas fa-tachometer-alt me-1"></i>{{ number_format($listing->mileage, 0, ',', ' ') }} km @endif</span>
-            <span class="spec-chip">@if($listing->fuel?->name)<i class="fas fa-gas-pump me-1"></i>{{ $listing->fuel->name }}@endif</span>
-            <span class="spec-chip">@if($listing->engine_capacity)<i class="fas fa-microchip me-1"></i>{{ $listing->engine_capacity }} cm³@endif</span>
-            <span class="spec-chip">@if($listing->power_hp)<i class="fas fa-horse-head me-1"></i>{{ $listing->power_hp }} KM@endif</span>
-            <span class="spec-chip">@if($listing->transmission?->name)<i class="fas fa-cog me-1"></i>{{ $listing->transmission->name }}@endif</span>
+            @foreach($specs as $spec)
+                <span class="spec-chip">{!! $spec !!}</span>
+            @endforeach
         </div>
 
         <div class="mt-auto d-flex align-items-center justify-content-between gap-2">

@@ -31,9 +31,9 @@
 
                 @foreach ($conversations as $conversation)
                     @php
-                        $lastMessage = $conversation->messages->first();
-                        $partner = $conversationActive->messages->where('sender_id', '!=', auth()->id())->first()?->sender;
+                        $lastMessage = $conversation->latestMessage;
 
+                        $partner = $conversation->messages->where('sender_id', '!=', auth()->id())->first()?->sender;
                     @endphp
 
                     <a href="{{ route('conversations.show', $conversation->id) }}" class="text-decoration-none text-dark">
@@ -51,7 +51,7 @@
                             </div>
 
                             <div class="text-muted" style="font-size: 13px;">
-                                {{ $partner?->name }}
+                                {{ $conversation->partner?->name ?? 'Brak rozmówcy' }}
                             </div>
 
                             <div class="text-muted" style="font-size: 14px;">
@@ -75,7 +75,7 @@
                         </h5>
 
                         <div class="text-muted" style="font-size: 14px;">
-                            {{ $partner?->name ?? 'Brak rozmówcy' }}
+                            {{ $conversationActive->partner?->name ?? 'Brak rozmówcy' }}
                         </div>
                     </div>
 

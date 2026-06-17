@@ -61,16 +61,17 @@ class ConversationController extends Controller
             ->with([
                 'listing.user',
                 'service.user',
-                'messages' => function ($q) {
-                    $q->latest()->limit(1);
-                }
+                'latestMessage',
             ])
             ->withCount(['messages as unread_count' => function ($q) use ($userId) {
                 $q->where('sender_id', '!=', $userId)
                     ->where('is_read', false);
             }])
-            ->latest()
-            ->get();
+            ->get()
+            ->sortByDesc(function ($conversation) {
+                return optional($conversation->latestMessage)->created_at;
+            })
+            ->values();
 
         return view('conversations.index', compact('conversations'));
     }
@@ -90,23 +91,20 @@ class ConversationController extends Controller
         }
 
         $conversations = Conversation::where('user2_id', $userId)
-            ->orWhereHas('listing', function ($q) use ($userId) {
-                $q->where('user_id', $userId);
-            })
-            ->orWhereHas('service', function ($q) use ($userId) {
-                $q->where('user_id', $userId);
-            })
+            ->orWhereHas('listing', fn($q) => $q->where('user_id', $userId))
+            ->orWhereHas('service', fn($q) => $q->where('user_id', $userId))
             ->with([
                 'listing.user',
                 'service.user',
-                'messages' => fn($q) => $q->latest()->limit(1)
+                'latestMessage',
             ])
             ->withCount(['messages as unread_count' => function ($q) use ($userId) {
                 $q->where('sender_id', '!=', $userId)
                     ->where('is_read', false);
             }])
-            ->latest()
-            ->get();
+            ->get()
+            ->sortByDesc(fn($c) => $c->latestMessage?->created_at)
+            ->values();
 
         $messages = Message::where('conversation_id', $id)
             ->with('sender')

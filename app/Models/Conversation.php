@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Conversation extends Model
 {
@@ -36,5 +37,29 @@ class Conversation extends Model
     public function latestMessage()
     {
         return $this->hasOne(Message::class)->latestOfMany();
+    }
+
+    public function user2()
+    {
+        return $this->belongsTo(User::class, 'user2_id');
+    }
+
+    public function getPartnerAttribute()
+    {
+        $authId = Auth::id();
+
+        if ($this->listing) {
+            return $this->listing->user_id == $authId
+                ? $this->user2
+                : $this->listing->user;
+        }
+
+        if ($this->service) {
+            return $this->service->user_id == $authId
+                ? $this->user2
+                : $this->service->user;
+        }
+
+        return null;
     }
 }

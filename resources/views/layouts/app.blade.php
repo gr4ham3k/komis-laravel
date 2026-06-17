@@ -109,8 +109,17 @@
         }
 
         @media (max-width: 576px) {
-        .spec-chips {
-            min-height: 5.5rem;
+        .spec-chips-grid {
+            display: grid;
+            grid-template-columns: repeat(3, auto);
+            gap: .25rem;
+            align-items: center;
+        }
+
+        .spec-chip:empty {
+            background: none;
+            border: none;
+            padding: 0;
         }
 
         .list-thumb-wrap {

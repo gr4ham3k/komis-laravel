@@ -36,25 +36,13 @@
             {{ $listing->brand?->name }} {{ $listing->carModel?->name }} &bull; {{ $listing->city }}
         </p>
 
-        <div class="d-flex flex-wrap gap-1 mb-3 spec-chips">
-            @if($listing->year)
-                <span class="spec-chip"><i class="far fa-calendar-alt me-1"></i>{{ $listing->year }}</span>
-            @endif
-            @if($listing->mileage)
-                <span class="spec-chip"><i class="fas fa-tachometer-alt me-1"></i>{{ number_format($listing->mileage, 0, ',', ' ') }} km</span>
-            @endif
-            @if($listing->fuel?->name)
-                <span class="spec-chip"><i class="fas fa-gas-pump me-1"></i>{{ $listing->fuel->name }}</span>
-            @endif
-            @if($listing->engine_capacity)
-                <span class="spec-chip"><i class="fas fa-microchip me-1"></i>{{ $listing->engine_capacity }} cm³</span>
-            @endif
-            @if($listing->power_hp)
-                <span class="spec-chip"><i class="fas fa-horse-head me-1"></i>{{ $listing->power_hp }} KM</span>
-            @endif
-            @if($listing->transmission?->name)
-                <span class="spec-chip"><i class="fas fa-cog me-1"></i>{{ $listing->transmission->name }}</span>
-            @endif
+        <div class="spec-chips-grid mb-3">
+            <span class="spec-chip">@if($listing->year)<i class="far fa-calendar-alt me-1"></i>{{ $listing->year }}@endif</span>
+            <span class="spec-chip">@if($listing->mileage)<i class="fas fa-tachometer-alt me-1"></i>{{ number_format($listing->mileage, 0, ',', ' ') }} km @endif</span>
+            <span class="spec-chip">@if($listing->fuel?->name)<i class="fas fa-gas-pump me-1"></i>{{ $listing->fuel->name }}@endif</span>
+            <span class="spec-chip">@if($listing->engine_capacity)<i class="fas fa-microchip me-1"></i>{{ $listing->engine_capacity }} cm³@endif</span>
+            <span class="spec-chip">@if($listing->power_hp)<i class="fas fa-horse-head me-1"></i>{{ $listing->power_hp }} KM@endif</span>
+            <span class="spec-chip">@if($listing->transmission?->name)<i class="fas fa-cog me-1"></i>{{ $listing->transmission->name }}@endif</span>
         </div>
 
         <div class="mt-auto">

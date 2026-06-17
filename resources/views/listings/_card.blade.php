@@ -36,7 +36,7 @@
             {{ $listing->brand?->name }} {{ $listing->carModel?->name }} &bull; {{ $listing->city }}
         </p>
 
-        <div class="d-flex flex-wrap gap-1 mb-3">
+        <div class="d-flex flex-wrap gap-1 mb-3 spec-chips">
             @if($listing->year)
                 <span class="spec-chip"><i class="far fa-calendar-alt me-1"></i>{{ $listing->year }}</span>
             @endif

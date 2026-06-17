@@ -109,7 +109,11 @@
         }
 
         @media (max-width: 576px) {
-            .list-thumb-wrap {
+        .spec-chips {
+            min-height: 5.5rem;
+        }
+
+        .list-thumb-wrap {
                 width: 140px;
                 min-height: 120px;
             }

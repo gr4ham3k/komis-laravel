@@ -25,7 +25,6 @@
 
         <div class="row">
 
-            <!-- LEWA STRONA (rozmowy) -->
             <div class="col-4 border-end bg-white" style="height: 90vh; overflow-y: auto;">
 
                 <h5 class="mb-3 p-3">Rozmowy</h5>
@@ -33,6 +32,8 @@
                 @foreach ($conversations as $conversation)
                     @php
                         $lastMessage = $conversation->messages->first();
+                        $partner = $conversationActive->messages->where('sender_id', '!=', auth()->id())->first()?->sender;
+
                     @endphp
 
                     <a href="{{ route('conversations.show', $conversation->id) }}" class="text-decoration-none text-dark">
@@ -43,13 +44,18 @@
                                 <strong style="font-size: 16px;">
                                     {{ $conversation->listing ? $conversation->listing->title : $conversation->service->title }}
                                 </strong>
+
                                 @if ($conversation->unread_count > 0)
                                     <span class="badge bg-danger rounded-pill">{{ $conversation->unread_count }}</span>
                                 @endif
                             </div>
 
+                            <div class="text-muted" style="font-size: 13px;">
+                                {{ $partner?->name }}
+                            </div>
+
                             <div class="text-muted" style="font-size: 14px;">
-                                {{ $lastMessage?->content ?? 'Brak wiadomości' }}
+                                {{ \Illuminate\Support\Str::limit($lastMessage?->content ?? 'Brak wiadomości', 50) }}
                             </div>
 
                         </div>
@@ -59,19 +65,20 @@
 
             </div>
 
-            <!-- PRAWA STRONA (czat) -->
             <div class="col-8 d-flex flex-column" style="height: 90vh;">
 
                 @if (isset($conversationActive))
 
-                    <!-- HEADER -->
                     <div class="border-bottom p-3 bg-white">
                         <h5 class="mb-0">
                             {{ $conversationActive->listing ? $conversationActive->listing->title : $conversationActive->service->title }}
                         </h5>
+
+                        <div class="text-muted" style="font-size: 14px;">
+                            {{ $partner?->name ?? 'Brak rozmówcy' }}
+                        </div>
                     </div>
 
-                    <!-- WIADOMOŚCI -->
                     <div class="flex-grow-1 p-3 overflow-auto" id="chat-box" style="background: #f8f9fa;">
 
                         @foreach ($conversationActive->messages as $message)
@@ -95,7 +102,8 @@
                                         {{ $message->created_at->format('H:i') }}
                                         @if ($message->sender_id == auth()->id())
                                             @if ($message->is_read)
-                                                <i class="fas fa-check-double ms-1" style="color: #53bdeb;" title="Przeczytana"></i>
+                                                <i class="fas fa-check-double ms-1" style="color: #53bdeb;"
+                                                    title="Przeczytana"></i>
                                             @else
                                                 <i class="fas fa-check ms-1 text-white-50" title="Dostarczona"></i>
                                             @endif
@@ -109,9 +117,16 @@
 
                     </div>
 
-                    <!-- INPUT -->
                     <div class="border-top p-3 bg-white">
-
+                        @if ($errors->any())
+                            <div class="alert alert-danger mb-3">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         <form method="POST" action="{{ route('messages.store') }}">
                             @csrf
 
@@ -120,7 +135,7 @@
                             <div class="input-group">
 
                                 <input type="text" name="content" class="form-control form-control-lg"
-                                    placeholder="Napisz wiadomość..." required>
+                                    placeholder="Napisz wiadomość..." value="{{ old('content') }}" required>
 
                                 <button class="btn btn-primary btn-lg">
                                     Wyślij

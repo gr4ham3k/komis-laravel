@@ -15,26 +15,74 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        if (User::count() > 0) {
+            return;
+        }
+
         User::factory()->create([
             'name' => 'Admin',
-            'email' => 'admin@komis.test',
+            'email' => 'admin@admin.com',
             'password' => bcrypt('admin'),
             'is_admin' => true,
         ]);
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Jan',
+            'email' => 'jan@example.com',
             'password' => bcrypt('password'),
         ]);
 
         User::factory()->create([
             'name' => 'Kamil',
-            'email' => 'second@example.com',
+            'email' => 'kamil@example.com',
             'password' => bcrypt('password'),
         ]);
 
-        User::factory(8)->create([
+        User::factory()->create([
+            'name' => 'Jakub',
+            'email' => 'jakub@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        User::factory()->create([
+            'name' => 'Wojtek',
+            'email' => 'wojtek@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        User::factory()->create([
+            'name' => 'Adam',
+            'email' => 'adam@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        User::factory()->create([
+            'name' => 'Adrian',
+            'email' => 'adrian@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        User::factory()->create([
+            'name' => 'Hubert',
+            'email' => 'hubert@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        User::factory()->create([
+            'name' => 'Filip',
+            'email' => 'filip@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        User::factory()->create([
+            'name' => 'Mateusz',
+            'email' => 'mateusz@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        User::factory()->create([
+            'name' => 'Tomasz',
+            'email' => 'tomasz@example.com',
             'password' => bcrypt('password'),
         ]);
 
@@ -45,6 +93,5 @@ class DatabaseSeeder extends Seeder
             ListingSeeder::class,
             ServiceSeeder::class
         ]);
-
     }
 }

@@ -135,7 +135,12 @@ class ListingController extends Controller
         $perPage = in_array($perPage, [10, 20, 50]) ? $perPage : 12;
         $listings = $query->paginate($perPage)->withQueryString();
 
-        return view('listings.index', array_merge($filterOptions, compact('listings', 'selectedTags')));
+        if ($request->has('view') && in_array($request->input('view'), ['grid', 'list'])) {
+            session(['listings_view' => $request->input('view')]);
+        }
+        $viewMode = session('listings_view', 'grid');
+
+        return view('listings.index', array_merge($filterOptions, compact('listings', 'selectedTags', 'viewMode')));
     }
 
     public function show(Listing $listing)

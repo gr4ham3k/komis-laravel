@@ -24,12 +24,10 @@
         </div>
 
         <div class="row g-4">
-            <!-- Pasek boczny z filtrami -->
             <div class="col-lg-3 col-md-4">
                 @include('listings._filters')
             </div>
 
-            <!-- Lista ogłoszeń -->
             <div class="col-lg-9 col-md-8">
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                     <p class="text-muted mb-0 small">Znaleziono: {{ $listings->total() }}</p>
@@ -53,14 +51,26 @@
                                 <option value="50" @selected(request('per_page', 12) == 50)>50</option>
                             </select>
                         </div>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <a href="{{ route('listings.index', ['view' => 'grid'] + request()->except('view')) }}" class="btn btn-outline-secondary {{ $viewMode === 'grid' ? 'active' : '' }}" title="Widok siatki">
+                                <i class="fas fa-th"></i>
+                            </a>
+                            <a href="{{ route('listings.index', ['view' => 'list'] + request()->except('view')) }}" class="btn btn-outline-secondary {{ $viewMode === 'list' ? 'active' : '' }}" title="Widok listy">
+                                <i class="fas fa-list"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <div class="row g-4">
+                <div class="{{ $viewMode === 'list' ? 'd-flex flex-column gap-3' : 'row g-4' }}">
                     @forelse ($listings as $listing)
-                        <div class="col-md-6 col-xl-4">
-                            @include('listings._card', ['listing' => $listing])
-                        </div>
+                        @if($viewMode === 'list')
+                            @include('listings._card_list', ['listing' => $listing])
+                        @else
+                            <div class="col-md-6 col-xl-4">
+                                @include('listings._card', ['listing' => $listing])
+                            </div>
+                        @endif
                     @empty
                         <div class="col-12">
                             <div class="alert alert-info mb-0">Brak ogłoszeń spełniających wybrane kryteria.</div>

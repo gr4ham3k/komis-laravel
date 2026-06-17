@@ -84,6 +84,44 @@
             background: #e9ecef;
         }
 
+        .spec-chip {
+            display: inline-flex;
+            align-items: center;
+            font-size: .75rem;
+            background: var(--mk-soft);
+            border: 1px solid var(--mk-line);
+            border-radius: 6px;
+            padding: .2rem .55rem;
+            color: var(--mk-muted);
+            white-space: nowrap;
+        }
+
+        .list-thumb-wrap {
+            width: 260px;
+            min-height: 180px;
+        }
+
+        .list-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        @media (max-width: 576px) {
+            .list-thumb-wrap {
+                width: 140px;
+                min-height: 120px;
+            }
+            .listing-card.flex-row {
+                flex-wrap: wrap;
+            }
+            .listing-card.flex-row .list-thumb-wrap {
+                width: 100%;
+                min-height: 180px;
+            }
+        }
+
         .tag-chip {
             display: inline-flex;
             align-items: center;

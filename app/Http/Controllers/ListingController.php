@@ -293,7 +293,7 @@ class ListingController extends Controller
         $query = $request->q;
 
         if (strlen($query) < 3) {
-            $brands = Brand::where('name', 'like', $query . '%')
+            $brands = Brand::where('name', 'ilike', $query . '%')
                 ->orderBy('name')
                 ->limit(10)
                 ->get();
@@ -315,7 +315,7 @@ class ListingController extends Controller
 
         if (strlen($query) < 3) {
             return CarModel::where('brand_id', $brandId)
-                ->where('name', 'like', $query . '%')
+                ->where('name', 'ilike', $query . '%')
                 ->orderBy('name')
                 ->limit(10)
                 ->get();

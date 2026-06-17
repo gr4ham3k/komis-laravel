@@ -36,7 +36,7 @@ class ServiceController extends Controller
 
         // ✅ FILTR: Miasto
         if ($request->filled('city')) {
-            $query->where('city', 'like', '%' . $request->city . '%');
+            $query->where('city', 'ilike', '%' . $request->city . '%');
         }
 
         // ✅ FILTR: Cena minimalna

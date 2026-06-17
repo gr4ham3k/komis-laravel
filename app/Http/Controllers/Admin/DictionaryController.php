@@ -9,20 +9,23 @@ use App\Models\CarModel;
 use App\Models\Fuel;
 use App\Models\Tag;
 use App\Models\Transmission;
+use Illuminate\Http\Request;
 
 class DictionaryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $brands = Brand::all();
-        $models = CarModel::with('brand')->get();
-        $fuels = Fuel::all();
-        $transmissions = Transmission::all();
-        $bodyTypes = BodyType::all();
-        $tags = Tag::all();
+        $brands = Brand::paginate(20, ['*'], 'brands_page');
+        $models = CarModel::with('brand')->paginate(20, ['*'], 'models_page');
+        $fuels = Fuel::paginate(20, ['*'], 'fuels_page');
+        $transmissions = Transmission::paginate(20, ['*'], 'transmissions_page');
+        $bodyTypes = BodyType::paginate(20, ['*'], 'body_types_page');
+        $tags = Tag::paginate(30, ['*'], 'tags_page');
 
-        return view('admin.dictionaries',compact('brands','models','fuels','transmissions','bodyTypes','tags'));
+        $activeTab = $request->input('active_tab', 'brands');
+
+        return view('admin.dictionaries', compact(
+            'brands', 'models', 'fuels', 'transmissions', 'bodyTypes', 'tags', 'activeTab'
+        ));
     }
-
-
 }

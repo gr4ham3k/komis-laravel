@@ -31,9 +31,7 @@
 
 @section('content')
 
-    @php
-        $activeTab = old('active_tab', session('activeTab', 'brands'));
-    @endphp
+
 
     <div class="container py-4">
 
@@ -161,6 +159,9 @@
                         </div>
                     @endforeach
                 </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $brands->appends(['active_tab' => 'brands'])->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
             <div class="tab-pane fade {{ $activeTab == 'models' ? 'show active' : '' }}" id="models">
@@ -247,6 +248,9 @@
                         </div>
                     @endforeach
                 </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $models->appends(['active_tab' => 'models'])->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
             <div class="tab-pane fade {{ $activeTab == 'fuels' ? 'show active' : '' }}" id="fuels">
@@ -297,6 +301,9 @@
                             </div>
                         </div>
                     @endforeach
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $fuels->appends(['active_tab' => 'fuels'])->links('pagination::bootstrap-5') }}
                 </div>
             </div>
 
@@ -351,6 +358,9 @@
                         </div>
                     @endforeach
                 </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $transmissions->appends(['active_tab' => 'transmissions'])->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
             <div class="tab-pane fade {{ $activeTab == 'bodytypes' ? 'show active' : '' }}" id="bodytypes">
@@ -401,6 +411,9 @@
                         </div>
                     @endforeach
                 </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $bodyTypes->appends(['active_tab' => 'bodytypes'])->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
             <div class="tab-pane fade {{ $activeTab == 'tags' ? 'show active' : '' }}" id="tags">
@@ -449,6 +462,9 @@
                             </div>
                         </div>
                     @endforeach
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $tags->appends(['active_tab' => 'tags'])->links('pagination::bootstrap-5') }}
                 </div>
             </div>
 

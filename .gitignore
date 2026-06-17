@@ -25,3 +25,7 @@ check_images.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+_users.php
+_check_app_url.php
+check_images.php

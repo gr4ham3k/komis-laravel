@@ -4,7 +4,7 @@
 @endphp
 
 <div class="listing-card d-flex flex-column h-100">
-    <a href="{{ route('listings.show', $listing) }}" class="text-decoration-none">
+    <a href="{{ route('listings.show', $listing) }}" class="text-decoration-none d-block">
         @if($listing->images->first())
             <img
                 src="{{ asset('storage/' . $listing->images->first()->file_name) }}"

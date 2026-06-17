@@ -292,16 +292,26 @@ class ListingController extends Controller
     {
         $query = $request->q;
 
-        if (strlen($query) < 3) {
+        if (strlen($query) < 2) {
             $brands = Brand::where('name', 'ilike', $query . '%')
                 ->orderBy('name')
                 ->limit(10)
                 ->get();
         } else {
-            $brands = Brand::whereRaw("similarity(name, ?) > 0.3", [$query])
+            $brands = Brand::where('name', 'ilike', $query . '%')
                 ->orderByRaw("similarity(name, ?) DESC", [$query])
+                ->orderBy('name')
                 ->limit(10)
                 ->get();
+
+            if ($brands->count() < 10) {
+                $fallback = Brand::where('name', 'not ilike', $query . '%')
+                    ->whereRaw("similarity(name, ?) > 0.4", [$query])
+                    ->orderByRaw("similarity(name, ?) DESC", [$query])
+                    ->limit(10 - $brands->count())
+                    ->get();
+                $brands = $brands->merge($fallback);
+            }
         }
 
         return response()->json($brands);

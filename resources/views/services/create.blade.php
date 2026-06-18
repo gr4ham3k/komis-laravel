@@ -1,10 +1,6 @@
 {{-- resources/views/services/create.blade.php --}}
 @extends('layouts.app')
 
-@push('styles')
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-@endpush
-
 @section('content')
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -65,9 +61,19 @@
 
                             <div class="col-12 mb-3">
                                 <label class="form-label">Wybierz lokalizację</label>
+
+                                <div class="input-group mb-2">
+                                    <input type="text" id="map-search-input" class="form-control"
+                                        placeholder="Wpisz miasto (np. Warszawa)">
+                                    <button type="button" class="btn btn-outline-secondary" id="map-search-btn">
+                                        Szukaj
+                                    </button>
+                                </div>
+
+                                <div id="map-status" class="text-muted small mt-2"></div>
+
                                 <div id="map" style="height: 350px; border-radius: 10px;"></div>
                                 <input type="hidden" name="city" id="city" value="{{ old('city') }}">
-                                <small class="text-muted">Kliknij na mapie aby wybrać miasto</small>
                                 @error('city')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
@@ -91,41 +97,93 @@
 @endsection
 
 @push('scripts')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // Inicjalizacja mapy - tak jak w oryginalnej wersji
-    const map = L.map('map').setView([52.237049, 21.017532], 12);
+document.addEventListener('DOMContentLoaded', function () {
+    const map = L.map('map').setView([50.0413, 21.9990], 6);
 
-    // Dodanie warstwy mapy - identyczna konfiguracja
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
+        attribution: '&copy; OpenStreetMap'
     }).addTo(map);
 
     let marker;
 
-    // Obsługa kliknięcia na mapie - identyczna logika
-    map.on('click', function(e) {
+    const cityInput = document.getElementById('city');
 
-        if (marker) {
-            map.removeLayer(marker);
-        }
+    function setMapStatus(text) {
+        document.getElementById('map-status').textContent = text;
+    }
+
+    map.on('click', function(e) {
+        if (marker) map.removeLayer(marker);
 
         marker = L.marker(e.latlng).addTo(map);
 
+        setMapStatus('Pobieram nazwę miasta...');
+
         fetch(`/geocode/reverse?lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
-            .then(res => res.json())
+            .then(r => r.json())
             .then(data => {
-
-                const city = data.address.city ||
-                           data.address.town ||
-                           data.address.village ||
-                           data.address.state ||
-                           '';
-
-                document.getElementById('city').value = city;
-
-                console.log("Wybrane miasto:", city);
+                const city = data.address?.city ||
+                             data.address?.town ||
+                             data.address?.village ||
+                             '';
+                cityInput.value = city;
+                if (city) {
+                    setMapStatus('Wybrano: ' + city);
+                } else {
+                    setMapStatus('Nie rozpoznano miasta');
+                }
+            })
+            .catch(function(error) {
+                setMapStatus('Błąd geokodowania');
+                console.error(error);
             });
     });
+
+    function searchLocation() {
+        const query = document.getElementById('map-search-input').value.trim();
+        if (!query) return;
+
+        setMapStatus('Szukam lokalizacji...');
+
+        fetch(`/geocode?q=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.length) {
+                    setMapStatus('Nie znaleziono lokalizacji');
+                    return;
+                }
+
+                const lat = parseFloat(data[0].lat);
+                const lng = parseFloat(data[0].lon);
+
+                map.setView([lat, lng], 10);
+
+                if (marker) map.removeLayer(marker);
+                marker = L.marker([lat, lng]).addTo(map);
+
+                cityInput.value =
+                    data[0].address?.city ||
+                    data[0].address?.town ||
+                    data[0].address?.village ||
+                    data[0].display_name?.split(',')[0] ||
+                    '';
+
+                setMapStatus('Znaleziono: ' + cityInput.value);
+            })
+            .catch(function() {
+                setMapStatus('Błąd wyszukiwania');
+            });
+    }
+
+    document.getElementById('map-search-btn').addEventListener('click', searchLocation);
+
+    document.getElementById('map-search-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchLocation();
+        }
+    });
+});
 </script>
 @endpush

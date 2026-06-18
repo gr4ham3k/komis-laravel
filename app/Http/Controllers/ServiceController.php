@@ -123,9 +123,9 @@ class ServiceController extends Controller
                 if ($imageFile && $imageFile->isValid()) {
                     $uuid = (string) Str::uuid();
                     $extension = $imageFile->getClientOriginalExtension();
-                    $fileName = $uuid . '.' . $extension;
+                    $fileName = 'services/' . $uuid . '.' . $extension;
 
-                    $imageFile->storeAs('services', $fileName, 'public');
+                    $imageFile->storeAs('services', $uuid . '.' . $extension, 'public');
 
                     $image = Image::create([
                         'file_name' => $fileName,
@@ -176,7 +176,7 @@ class ServiceController extends Controller
             foreach ($request->delete_images as $imageId) {
                 $image = Image::find($imageId);
                 if ($image) {
-                    $filePath = storage_path('app/public/services/' . $image->file_name);
+                    $filePath = storage_path('app/public/' . $image->file_name);
                     if (file_exists($filePath)) {
                         unlink($filePath);
                     }
@@ -192,9 +192,9 @@ class ServiceController extends Controller
                 if ($imageFile && $imageFile->isValid()) {
                     $uuid = (string) Str::uuid();
                     $extension = $imageFile->getClientOriginalExtension();
-                    $fileName = $uuid . '.' . $extension;
+                    $fileName = 'services/' . $uuid . '.' . $extension;
 
-                    $imageFile->storeAs('services', $fileName, 'public');
+                    $imageFile->storeAs('services', $uuid . '.' . $extension, 'public');
 
                     $image = Image::create([
                         'file_name' => $fileName,
@@ -216,7 +216,7 @@ class ServiceController extends Controller
         $service = Service::where('user_id', Auth::id())->findOrFail($id);
 
         foreach ($service->images as $image) {
-            $filePath = storage_path('app/public/services/' . $image->file_name);
+            $filePath = storage_path('app/public/' . $image->file_name);
             if (file_exists($filePath)) {
                 unlink($filePath);
             }

@@ -135,7 +135,12 @@ class ListingController extends Controller
         $perPage = in_array($perPage, [10, 20, 50]) ? $perPage : 12;
         $listings = $query->paginate($perPage)->withQueryString();
 
-        return view('listings.index', array_merge($filterOptions, compact('listings', 'selectedTags')));
+        if ($request->has('view') && in_array($request->input('view'), ['grid', 'list'])) {
+            session(['listings_view' => $request->input('view')]);
+        }
+        $viewMode = session('listings_view', 'grid');
+
+        return view('listings.index', array_merge($filterOptions, compact('listings', 'selectedTags', 'viewMode')));
     }
 
     public function show(Listing $listing)
@@ -292,16 +297,26 @@ class ListingController extends Controller
     {
         $query = $request->q;
 
-        if (strlen($query) < 3) {
-            $brands = Brand::where('name', 'like', $query . '%')
+        if (strlen($query) < 2) {
+            $brands = Brand::where('name', 'ilike', $query . '%')
                 ->orderBy('name')
                 ->limit(10)
                 ->get();
         } else {
-            $brands = Brand::whereRaw("similarity(name, ?) > 0.3", [$query])
+            $brands = Brand::where('name', 'ilike', $query . '%')
                 ->orderByRaw("similarity(name, ?) DESC", [$query])
+                ->orderBy('name')
                 ->limit(10)
                 ->get();
+
+            if ($brands->count() < 10) {
+                $fallback = Brand::where('name', 'not ilike', $query . '%')
+                    ->whereRaw("similarity(name, ?) > 0.4", [$query])
+                    ->orderByRaw("similarity(name, ?) DESC", [$query])
+                    ->limit(10 - $brands->count())
+                    ->get();
+                $brands = $brands->merge($fallback);
+            }
         }
 
         return response()->json($brands);
@@ -315,7 +330,7 @@ class ListingController extends Controller
 
         if (strlen($query) < 3) {
             return CarModel::where('brand_id', $brandId)
-                ->where('name', 'like', $query . '%')
+                ->where('name', 'ilike', $query . '%')
                 ->orderBy('name')
                 ->limit(10)
                 ->get();

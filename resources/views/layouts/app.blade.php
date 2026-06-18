@@ -77,9 +77,62 @@
 
         .listing-thumb {
             width: 100%;
+            max-width: 100%;
+            display: block;
             aspect-ratio: 16 / 10;
             object-fit: cover;
             background: #e9ecef;
+        }
+
+        .spec-chip {
+            display: inline-flex;
+            align-items: center;
+            font-size: .75rem;
+            background: var(--mk-soft);
+            border: 1px solid var(--mk-line);
+            border-radius: 6px;
+            padding: .2rem .55rem;
+            color: var(--mk-muted);
+            white-space: nowrap;
+        }
+
+        .list-thumb-wrap {
+            width: 260px;
+            min-height: 180px;
+        }
+
+        .list-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        @media (max-width: 576px) {
+        .spec-chips-grid {
+            display: grid;
+            grid-template-columns: repeat(3, auto);
+            gap: .25rem;
+            align-items: center;
+        }
+
+        .spec-chip:empty {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .list-thumb-wrap {
+                width: 140px;
+                min-height: 120px;
+            }
+            .listing-card.flex-row {
+                flex-wrap: wrap;
+            }
+            .listing-card.flex-row .list-thumb-wrap {
+                width: 100%;
+                min-height: 180px;
+            }
         }
 
         .tag-chip {

@@ -289,7 +289,7 @@
 
                 <!-- Paginacja -->
                 <div class="mt-4">
-                    {{ $services->links() }}
+                    {{ $services->links('pagination::bootstrap-5') }}
                 </div>
             </div>
         </div>

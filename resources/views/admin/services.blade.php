@@ -360,7 +360,7 @@
     </div>
 
     <div class="mt-4 d-flex justify-content-center">
-        {{ $services->links() }}
+        {{ $services->links('pagination::bootstrap-5') }}
     </div>
 </div>
 

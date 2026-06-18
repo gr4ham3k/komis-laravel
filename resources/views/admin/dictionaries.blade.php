@@ -31,9 +31,7 @@
 
 @section('content')
 
-    @php
-        $activeTab = old('active_tab', session('activeTab', 'brands'));
-    @endphp
+
 
     <div class="container py-4">
 
@@ -121,6 +119,12 @@
                     <button class="btn btn-primary">Dodaj</button>
                 </form>
 
+                <form method="GET" action="{{ route('admin.dictionaries.index') }}" class="d-flex gap-2 mb-3">
+                    <input type="search" name="brands_search" class="form-control" placeholder="Szukaj marki..." value="{{ request('brands_search') }}">
+                    <input type="hidden" name="active_tab" value="brands">
+                    <button class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
+                </form>
+
                 <div class="list-group">
                     @foreach ($brands as $brand)
                         <div class="list-group-item">
@@ -161,6 +165,9 @@
                         </div>
                     @endforeach
                 </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $brands->appends(['active_tab' => 'brands'])->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
             <div class="tab-pane fade {{ $activeTab == 'models' ? 'show active' : '' }}" id="models">
@@ -187,6 +194,12 @@
                     <div class="col-md-2">
                         <button class="btn btn-primary w-100">Dodaj</button>
                     </div>
+                </form>
+
+                <form method="GET" action="{{ route('admin.dictionaries.index') }}" class="d-flex gap-2 mb-3">
+                    <input type="search" name="models_search" class="form-control" placeholder="Szukaj modelu..." value="{{ request('models_search') }}">
+                    <input type="hidden" name="active_tab" value="models">
+                    <button class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
                 </form>
 
                 <div class="list-group">
@@ -247,6 +260,9 @@
                         </div>
                     @endforeach
                 </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $models->appends(['active_tab' => 'models'])->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
             <div class="tab-pane fade {{ $activeTab == 'fuels' ? 'show active' : '' }}" id="fuels">
@@ -258,6 +274,12 @@
                     <input type="hidden" name="active_tab" value="fuels">
 
                     <button class="btn btn-primary">Dodaj</button>
+                </form>
+
+                <form method="GET" action="{{ route('admin.dictionaries.index') }}" class="d-flex gap-2 mb-3">
+                    <input type="search" name="fuels_search" class="form-control" placeholder="Szukaj paliwa..." value="{{ request('fuels_search') }}">
+                    <input type="hidden" name="active_tab" value="fuels">
+                    <button class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
                 </form>
 
                 <div class="list-group">
@@ -298,6 +320,9 @@
                         </div>
                     @endforeach
                 </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $fuels->appends(['active_tab' => 'fuels'])->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
             <div class="tab-pane fade {{ $activeTab == 'transmissions' ? 'show active' : '' }}" id="transmissions">
@@ -309,6 +334,12 @@
                     <input type="text" name="name" class="form-control" placeholder="Nowa skrzynia">
                     <input type="hidden" name="active_tab" value="transmissions">
                     <button class="btn btn-primary">Dodaj</button>
+                </form>
+
+                <form method="GET" action="{{ route('admin.dictionaries.index') }}" class="d-flex gap-2 mb-3">
+                    <input type="search" name="transmissions_search" class="form-control" placeholder="Szukaj skrzyni..." value="{{ request('transmissions_search') }}">
+                    <input type="hidden" name="active_tab" value="transmissions">
+                    <button class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
                 </form>
 
                 <div class="list-group">
@@ -351,6 +382,9 @@
                         </div>
                     @endforeach
                 </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $transmissions->appends(['active_tab' => 'transmissions'])->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
             <div class="tab-pane fade {{ $activeTab == 'bodytypes' ? 'show active' : '' }}" id="bodytypes">
@@ -361,6 +395,12 @@
                     <input type="text" name="name" class="form-control" placeholder="Typ nadwozia">
                     <input type="hidden" name="active_tab" value="bodytypes">
                     <button class="btn btn-primary">Dodaj</button>
+                </form>
+
+                <form method="GET" action="{{ route('admin.dictionaries.index') }}" class="d-flex gap-2 mb-3">
+                    <input type="search" name="body_types_search" class="form-control" placeholder="Szukaj nadwozia..." value="{{ request('body_types_search') }}">
+                    <input type="hidden" name="active_tab" value="bodytypes">
+                    <button class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
                 </form>
 
                 <div class="list-group">
@@ -401,6 +441,9 @@
                         </div>
                     @endforeach
                 </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $bodyTypes->appends(['active_tab' => 'bodytypes'])->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
             <div class="tab-pane fade {{ $activeTab == 'tags' ? 'show active' : '' }}" id="tags">
@@ -411,6 +454,12 @@
                     <input type="text" name="name" class="form-control" placeholder="Nowy tag">
                     <input type="hidden" name="active_tab" value="tags">
                     <button class="btn btn-primary">Dodaj</button>
+                </form>
+
+                <form method="GET" action="{{ route('admin.dictionaries.index') }}" class="d-flex gap-2 mb-3">
+                    <input type="search" name="tags_search" class="form-control" placeholder="Szukaj tagu..." value="{{ request('tags_search') }}">
+                    <input type="hidden" name="active_tab" value="tags">
+                    <button class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
                 </form>
 
                 <div class="list-group">
@@ -449,6 +498,9 @@
                             </div>
                         </div>
                     @endforeach
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $tags->appends(['active_tab' => 'tags'])->links('pagination::bootstrap-5') }}
                 </div>
             </div>
 

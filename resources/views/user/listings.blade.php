@@ -95,7 +95,7 @@
         </div>
 
         <div class="mt-4">
-            {{ $listings->links() }}
+            {{ $listings->links('pagination::bootstrap-5') }}
         </div>
     @endif
 </div>

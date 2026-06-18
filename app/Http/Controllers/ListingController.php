@@ -45,8 +45,8 @@ class ListingController extends Controller
     {
         $filterOptions = $this->filterOptions();
         $selectedTags = collect($request->input('tags', []))
-            ->filter(fn ($id) => is_numeric($id))
-            ->map(fn ($id) => (int) $id)
+            ->filter(fn($id) => is_numeric($id))
+            ->map(fn($id) => (int) $id)
             ->values()
             ->all();
 
@@ -61,8 +61,8 @@ class ListingController extends Controller
                         ->orWhere('description', 'ilike', "%{$search}%")
                         ->orWhere('city', 'ilike', "%{$search}%")
                         ->orWhere('color', 'ilike', "%{$search}%")
-                        ->orWhereHas('brand', fn ($q) => $q->where('name', 'ilike', "%{$search}%"))
-                        ->orWhereHas('carModel', fn ($q) => $q->where('name', 'ilike', "%{$search}%"));
+                        ->orWhereHas('brand', fn($q) => $q->where('name', 'ilike', "%{$search}%"))
+                        ->orWhereHas('carModel', fn($q) => $q->where('name', 'ilike', "%{$search}%"));
                 });
             } else {
                 $query->where(function ($subQuery) use ($search) {
@@ -71,8 +71,8 @@ class ListingController extends Controller
                         ->orWhereRaw("similarity(description, ?) > 0.3", [$search])
                         ->orWhereRaw("similarity(city, ?) > 0.3", [$search])
                         ->orWhereRaw("similarity(color, ?) > 0.3", [$search])
-                        ->orWhereHas('brand', fn ($q) => $q->whereRaw("similarity(name, ?) > 0.3", [$search]))
-                        ->orWhereHas('carModel', fn ($q) => $q->whereRaw("similarity(name, ?) > 0.3", [$search]));
+                        ->orWhereHas('brand', fn($q) => $q->whereRaw("similarity(name, ?) > 0.3", [$search]))
+                        ->orWhereHas('carModel', fn($q) => $q->whereRaw("similarity(name, ?) > 0.3", [$search]));
                 });
                 $query->orderByRaw("GREATEST(
                     COALESCE(similarity(title, ?), 0),
@@ -104,22 +104,24 @@ class ListingController extends Controller
             $query->where('city', $request->input('city'));
         }
 
-        foreach ([
-            'price_min' => ['price', '>='],
-            'price_max' => ['price', '<='],
-            'year_min' => ['year', '>='],
-            'year_max' => ['year', '<='],
-            'mileage_max' => ['mileage', '<='],
-            'power_min' => ['power_hp', '>='],
-            'engine_min' => ['engine_capacity', '>='],
-        ] as $input => [$column, $operator]) {
+        foreach (
+            [
+                'price_min' => ['price', '>='],
+                'price_max' => ['price', '<='],
+                'year_min' => ['year', '>='],
+                'year_max' => ['year', '<='],
+                'mileage_max' => ['mileage', '<='],
+                'power_min' => ['power_hp', '>='],
+                'engine_min' => ['engine_capacity', '>='],
+            ] as $input => [$column, $operator]
+        ) {
             if ($request->filled($input)) {
                 $query->where($column, $operator, $request->input($input));
             }
         }
 
         foreach ($selectedTags as $tagId) {
-            $query->whereHas('tags', fn ($tagQuery) => $tagQuery->where('tags.id', $tagId));
+            $query->whereHas('tags', fn($tagQuery) => $tagQuery->where('tags.id', $tagId));
         }
 
         match ($request->input('sort')) {
@@ -170,9 +172,9 @@ class ListingController extends Controller
 
             'price' => 'required|numeric|min:0',
 
-            'city' => 'required|string|max:255',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
+            'city' => 'nullable|string|max:255',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
 
             'year' => 'required|integer|min:1900|max:' . date('Y'),
 
@@ -200,12 +202,37 @@ class ListingController extends Controller
             'engine_capacity.max' => 'Pojemność silnika jest zbyt duża.',
             'power_hp.min' => 'Moc musi być większa od 0 KM.',
             'power_hp.max' => 'Moc jest zbyt duża.',
+            'latitude.required' => 'Wybierz lokalizację na mapie.',
+            'longitude.required' => 'Wybierz lokalizację na mapie.',
 
         ]);
 
         $validated['user_id'] = Auth::id();
         $validated['status'] = 'inactive';
         $validated['views_count'] = 0;
+
+        if (!$validated['city'] && $request->latitude && $request->longitude) {
+
+            $response = Http::withHeaders([
+                'User-Agent' => 'MotoKomis/1.0',
+                'Accept-Language' => 'pl',
+            ])->get('https://nominatim.openstreetmap.org/reverse', [
+                'format' => 'json',
+                'lat' => $request->latitude,
+                'lon' => $request->longitude,
+            ]);
+
+            if ($response->ok()) {
+                $data = $response->json();
+
+                $validated['city'] =
+                    $data['address']['city'] ??
+                    $data['address']['town'] ??
+                    $data['address']['village'] ??
+                    $data['address']['state'] ??
+                    'Unknown';
+            }
+        }
 
         $listing = Listing::create($validated);
 
@@ -240,7 +267,7 @@ class ListingController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string|min:20',
             'price' => 'required|numeric|min:0',
-            'city' => 'required|string|max:255',
+            'city' => 'nullable|string|max:255',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
             'year' => 'required|integer|min:1900|max:' . date('Y'),
@@ -264,6 +291,29 @@ class ListingController extends Controller
             'power_hp.min' => 'Moc musi być większa od 0 KM.',
             'power_hp.max' => 'Moc jest zbyt duża.',
         ]);
+
+        if ($request->latitude && $request->longitude) {
+
+            $response = Http::withHeaders([
+                'User-Agent' => 'MotoKomis/1.0',
+                'Accept-Language' => 'pl',
+            ])->get('https://nominatim.openstreetmap.org/reverse', [
+                'format' => 'json',
+                'lat' => $request->latitude,
+                'lon' => $request->longitude,
+            ]);
+
+            if ($response->ok()) {
+                $data = $response->json();
+
+                $validated['city'] =
+                    $data['address']['city'] ??
+                    $data['address']['town'] ??
+                    $data['address']['village'] ??
+                    $data['address']['state'] ??
+                    'Unknown';
+            }
+        }
 
         $listing->update($validated);
         $listing->tags()->sync($request->tags ?? []);

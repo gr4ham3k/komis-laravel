@@ -23,18 +23,44 @@
                             </div>
                         @endif
 
-                        <div class="col-12">
-                            <div class="alert alert-secondary d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong>Zdjęcia ogłoszenia</strong><br>
-                                    <small class="text-muted">Dodaj lub usuń zdjęcia auta</small>
+                        @if ($listing->images->count() > 0)
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                                    <span class="fw-semibold">
+                                        Zdjęcia ({{ $listing->images->count() }})
+                                    </span>
+
+                                    <a href="{{ route('listings.images.edit', $listing) }}" class="btn btn-sm btn-primary">
+                                        Zarządzaj
+                                    </a>
                                 </div>
 
-                                <a href="{{ route('listings.images.edit', $listing) }}" class="btn btn-primary">
-                                    Zarządzaj
-                                </a>
+                                <div class="card-body">
+                                    <div class="row g-2">
+                                        @foreach ($listing->images as $image)
+                                            <div class="col-6 col-md-4">
+                                                <img src="{{ asset('storage/' . $image->file_name) }}"
+                                                    class="img-fluid rounded shadow-sm"
+                                                    style="aspect-ratio: 4/3; object-fit: cover;" alt="Zdjęcie">
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        @else
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-body d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Brak zdjęć</strong><br>
+                                        <small class="text-muted">Dodaj zdjęcia do ogłoszenia</small>
+                                    </div>
+
+                                    <a href="{{ route('listings.images.edit', $listing) }}" class="btn btn-primary">
+                                        Dodaj zdjęcia
+                                    </a>
+                                </div>
+                            </div>
+                        @endif
 
                         <form method="POST" action="{{ route('listings.update', $listing) }}"
                             enctype="multipart/form-data">
@@ -201,6 +227,17 @@
 
                                 <div class="col-12 mb-3">
                                     <label class="form-label">Wybierz lokalizację</label>
+
+                                    <div class="input-group mb-2">
+                                        <input type="text" id="map-search-input" class="form-control"
+                                            placeholder="Wpisz miasto (np. Warszawa)">
+                                        <button type="button" id="map-search-btn" class="btn btn-outline-secondary">
+                                            Szukaj
+                                        </button>
+                                    </div>
+
+                                    <div id="map-status" class="text-muted small mt-2"></div>
+
                                     <div id="map" style="height: 350px; border-radius: 10px;"></div>
                                     <input type="hidden" name="city" id="city"
                                         value="{{ old('city', $listing->city) }}">
@@ -249,31 +286,108 @@
 
 @push('scripts')
     <script>
-        const map = L.map('map').setView([{{ $listing->latitude ?? '50.0413' }}, {{ $listing->longitude ?? '21.9990' }}],
-            13);
+        document.addEventListener('DOMContentLoaded', function() {
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+            const initialLat = {{ $listing->latitude ?? 50.0413 }};
+            const initialLng = {{ $listing->longitude ?? 21.999 }};
+            const hasLocation = {{ $listing->latitude && $listing->longitude ? 'true' : 'false' }};
 
-        let marker;
-        @if ($listing->latitude && $listing->longitude)
-            marker = L.marker([{{ $listing->latitude }}, {{ $listing->longitude }}]).addTo(map);
-        @endif
+            const map = L.map('map').setView([initialLat, initialLng], 10);
 
-        map.on('click', function(e) {
-            if (marker) map.removeLayer(marker);
-            marker = L.marker(e.latlng).addTo(map);
-            document.getElementById('latitude').value = e.latlng.lat;
-            document.getElementById('longitude').value = e.latlng.lng;
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
 
-            fetch(`/geocode/reverse?lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
-                .then(res => res.json())
-                .then(data => {
-                    const city = data.address.city || data.address.town || data.address.village || data.address
-                        .state || '';
-                    document.getElementById('city').value = city;
+            let marker = null;
+
+            if (hasLocation) {
+                marker = L.marker([initialLat, initialLng]).addTo(map);
+            }
+
+            document.getElementById('latitude').value = initialLat;
+            document.getElementById('longitude').value = initialLng;
+
+            const latInput = document.getElementById('latitude');
+            const lngInput = document.getElementById('longitude');
+            const cityInput = document.getElementById('city');
+
+            function setMapStatus(text) {
+                document.getElementById('map-status').textContent = text;
+            }
+
+            function searchLocation() {
+                const query = document.getElementById('map-search-input').value.trim();
+                if (!query) return;
+
+                setMapStatus('🔎 Szukam lokalizacji...');
+
+                fetch(`/geocode?q=${encodeURIComponent(query)}`)
+                    .then(res => res.json())
+                    .then(data => {
+
+                        if (!data.length) {
+                            setMapStatus('❌ Nie znaleziono lokalizacji');
+                            return;
+                        }
+
+                        const lat = parseFloat(data[0].lat);
+                        const lng = parseFloat(data[0].lon);
+
+                        map.setView([lat, lng], 10);
+
+                        if (marker) {
+                            marker.setLatLng([lat, lng]);
+                        } else {
+                            marker = L.marker([lat, lng]).addTo(map);
+                        }
+
+                        latInput.value = lat;
+                        lngInput.value = lng;
+
+                        cityInput.value =
+                            data[0].address?.city ||
+                            data[0].address?.town ||
+                            data[0].address?.village ||
+                            data[0].display_name.split(',')[0];
+
+                        setMapStatus('📍 Znaleziono lokalizację');
+                    })
+                    .catch(() => {
+                        setMapStatus('❌ Błąd wyszukiwania');
+                    });
+            }
+
+            document.getElementById('map-search-btn')
+                .addEventListener('click', searchLocation);
+
+            document.getElementById('map-search-input')
+                .addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        searchLocation();
+                    }
                 });
+
+            map.on('click', function(e) {
+
+                if (marker) map.removeLayer(marker);
+
+                marker = L.marker(e.latlng).addTo(map);
+
+                latInput.value = e.latlng.lat;
+                lngInput.value = e.latlng.lng;
+
+                fetch(`/geocode/reverse?lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        cityInput.value =
+                            data.address?.city ||
+                            data.address?.town ||
+                            data.address?.village ||
+                            '';
+                    });
+            });
+
         });
     </script>
 

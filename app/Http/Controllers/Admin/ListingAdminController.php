@@ -45,6 +45,8 @@ class ListingAdminController extends Controller
             'description' => 'required|string|min:20',
             'price' => 'required|numeric|min:0',
             'city' => 'required|string|max:255',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
             'year' => 'required|integer|min:1900|max:' . date('Y'),
             'brand_id' => 'required|exists:brands,id',
             'model_id' => 'required|exists:car_models,id',

@@ -19,7 +19,8 @@ class ListingImageController extends Controller
     public function store(Request $request, Listing $listing)
     {
         $request->validate([
-            'images.*' => 'required|image|max:2048',
+            'images' => 'required|array|min:1',
+            'images.*' => 'image|max:2048',
         ]);
 
         foreach ($request->file('images') as $imageFile) {
@@ -60,9 +61,17 @@ class ListingImageController extends Controller
 
     public function destroy(Image $image)
     {
+        $listing = $image->listings()->first();
+
         Storage::disk('public')->delete($image->file_name);
 
         $image->delete();
+
+        if ($listing && $listing->images()->count() === 0) {
+            $listing->update([
+                'status' => 'inactive'
+            ]);
+        }
 
         return back()->with('success', 'Zdjęcie usunięte');
     }

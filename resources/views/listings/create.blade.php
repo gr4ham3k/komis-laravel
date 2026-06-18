@@ -25,7 +25,7 @@
                                 </div>
                             @endif
 
-                            <form method="POST" action="" enctype="multipart/form-data">
+                            <form method="POST" action="{{ route('listings.store') }}" enctype="multipart/form-data">
                                 @csrf
 
                                 <div class="row g-3">
@@ -198,6 +198,16 @@
                                     <div class="col-12 mb-3">
                                         <label class="form-label">Wybierz lokalizację</label>
 
+                                        <div class="input-group mb-2">
+                                            <input type="text" id="map-search-input" class="form-control"
+                                                placeholder="Wpisz miasto (np. Warszawa)">
+                                            <button type="button" class="btn btn-outline-secondary" id="map-search-btn">
+                                                Szukaj
+                                            </button>
+                                        </div>
+
+                                        <div id="map-status" class="text-muted small mt-2"></div>
+
                                         <div id="map" style="height: 350px; border-radius: 10px;"></div>
 
                                         <input type="hidden" name="city" id="city">
@@ -246,102 +256,212 @@
 
     @endsection
 
-@push('scripts')
-<script>
-    const map = L.map('map').setView([50.0413, 21.9990], 6);
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
+                const map = L.map('map').setView([50.0413, 21.9990], 6);
 
-    let marker;
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap'
+                }).addTo(map);
 
-    map.on('click', function(e) {
+                let marker;
 
-        if (marker) {
-            map.removeLayer(marker);
-        }
+                const latInput = document.getElementById('latitude');
+                const lngInput = document.getElementById('longitude');
+                const cityInput = document.getElementById('city');
 
-        marker = L.marker(e.latlng).addTo(map);
+                // klik na mapie
+                map.on('click', function(e) {
 
-        document.getElementById('latitude').value = e.latlng.lat;
-        document.getElementById('longitude').value = e.latlng.lng;
+                    if (marker) map.removeLayer(marker);
 
-        fetch(`/geocode/reverse?lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
-            .then(res => res.json())
-            .then(data => {
+                    marker = L.marker(e.latlng).addTo(map);
 
-                const city =
-                    data.address.city ||
-                    data.address.town ||
-                    data.address.village ||
-                    data.address.state ||
-                    '';
+                    latInput.value = e.latlng.lat;
+                    lngInput.value = e.latlng.lng;
 
-                document.getElementById('city').value = city;
+                    fetch(`/geocode/reverse?lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            cityInput.value =
+                                data.address?.city ||
+                                data.address?.town ||
+                                data.address?.village ||
+                                '';
+                        });
+                });
 
-                console.log("Wybrane miasto:", city);
+                // 🔎 SEARCH
+                const mapSearchBtn = document.getElementById('map-search-btn');
+                const mapSearchInput = document.getElementById('map-search-input');
+
+                function setMapStatus(text) {
+                    document.getElementById('map-status').textContent = text;
+                }
+
+                function searchLocation() {
+
+                    const query = mapSearchInput.value.trim();
+                    if (!query) return;
+
+                    setMapStatus('🔎 Szukam lokalizacji...');
+
+                    fetch(`/geocode?q=${encodeURIComponent(query)}`)
+                        .then(res => res.json())
+                        .then(data => {
+
+                            if (!data.length) {
+                                setMapStatus('❌ Nie znaleziono lokalizacji');
+                                return;
+                            }
+
+                            const lat = parseFloat(data[0].lat);
+                            const lng = parseFloat(data[0].lon);
+
+                            map.setView([lat, lng], 10);
+
+                            if (marker) map.removeLayer(marker);
+                            marker = L.marker([lat, lng]).addTo(map);
+
+                            document.getElementById('latitude').value = lat;
+                            document.getElementById('longitude').value = lng;
+
+                            document.getElementById('city').value =
+                                data[0].address?.city ||
+                                data[0].address?.town ||
+                                data[0].address?.village ||
+                                data[0].display_name.split(',')[0];
+
+                            setMapStatus('📍 Znaleziono lokalizację');
+                        })
+                        .catch(() => {
+                            setMapStatus('❌ Błąd wyszukiwania');
+                        });
+                }
+
+                mapSearchBtn.addEventListener('click', searchLocation);
+
+                mapSearchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        searchLocation();
+                    }
+                });
+
             });
-    });
-</script>
 
-<script>
-    const search = document.getElementById('brand-search');
-    const results = document.getElementById('brand-results');
-    const brandId = document.getElementById('brand-id');
+            const mapSearchBtn = document.getElementById('map-search-btn');
+            const mapSearchInput = document.getElementById('map-search-input');
 
-    search.addEventListener('input', async () => {
-        if (search.value.length < 1) {
-            results.innerHTML = '';
-            return;
-        }
-        const response = await fetch(`/brands/search?q=${encodeURIComponent(search.value)}`);
-        const brands = await response.json();
-        results.innerHTML = '';
-        brands.forEach(brand => {
-            const item = document.createElement('button');
-            item.type = 'button';
-            item.className = 'list-group-item list-group-item-action';
-            item.textContent = brand.name;
-            item.onclick = () => {
-                search.value = brand.name;
-                brandId.value = brand.id;
+            function searchLocation() {
+
+                const query = mapSearchInput.value.trim();
+
+                if (!query) return;
+
+                fetch(`/geocode?q=${encodeURIComponent(query)}`)
+                    .then(res => res.json())
+                    .then(data => {
+
+                        if (!data.length) {
+                            alert('Nie znaleziono lokalizacji');
+                            return;
+                        }
+
+                        const lat = parseFloat(data[0].lat);
+                        const lng = parseFloat(data[0].lon);
+
+                        map.setView([lat, lng], 10);
+
+                        if (marker) {
+                            marker.setLatLng([lat, lng]);
+                        } else {
+                            marker = L.marker([lat, lng]).addTo(map);
+                        }
+
+                        document.getElementById('latitude').value = lat;
+                        document.getElementById('longitude').value = lng;
+
+                        const city =
+                            data[0].address?.city ||
+                            data[0].address?.town ||
+                            data[0].address?.village ||
+                            query;
+
+                        document.getElementById('city').value = city;
+                    });
+            }
+
+            mapSearchBtn.addEventListener('click', searchLocation);
+
+            mapSearchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchLocation();
+                }
+            });
+        </script>
+
+        <script>
+            const search = document.getElementById('brand-search');
+            const results = document.getElementById('brand-results');
+            const brandId = document.getElementById('brand-id');
+
+            search.addEventListener('input', async () => {
+                if (search.value.length < 1) {
+                    results.innerHTML = '';
+                    return;
+                }
+                const response = await fetch(`/brands/search?q=${encodeURIComponent(search.value)}`);
+                const brands = await response.json();
                 results.innerHTML = '';
-                modelSearch.value = '';
-                modelId.value = '';
-                modelResults.innerHTML = '';
-            };
-            results.appendChild(item);
-        });
-    });
-</script>
+                brands.forEach(brand => {
+                    const item = document.createElement('button');
+                    item.type = 'button';
+                    item.className = 'list-group-item list-group-item-action';
+                    item.textContent = brand.name;
+                    item.onclick = () => {
+                        search.value = brand.name;
+                        brandId.value = brand.id;
+                        results.innerHTML = '';
+                        modelSearch.value = '';
+                        modelId.value = '';
+                        modelResults.innerHTML = '';
+                    };
+                    results.appendChild(item);
+                });
+            });
+        </script>
 
-<script>
-    const modelSearch = document.getElementById('model-search');
-    const modelResults = document.getElementById('model-results');
-    const modelId = document.getElementById('model-id');
+        <script>
+            const modelSearch = document.getElementById('model-search');
+            const modelResults = document.getElementById('model-results');
+            const modelId = document.getElementById('model-id');
 
-    modelSearch.addEventListener('input', async () => {
-        if (!brandId.value) return;
-        if (modelSearch.value.length < 1) {
-            modelResults.innerHTML = '';
-            return;
-        }
-        const response = await fetch(`/models/search?brand_id=${brandId.value}&q=${encodeURIComponent(modelSearch.value)}`);
-        const models = await response.json();
-        modelResults.innerHTML = '';
-        models.forEach(model => {
-            const item = document.createElement('button');
-            item.type = 'button';
-            item.className = 'list-group-item list-group-item-action';
-            item.textContent = model.name;
-            item.onclick = () => {
-                modelSearch.value = model.name;
-                modelId.value = model.id;
+            modelSearch.addEventListener('input', async () => {
+                if (!brandId.value) return;
+                if (modelSearch.value.length < 1) {
+                    modelResults.innerHTML = '';
+                    return;
+                }
+                const response = await fetch(
+                    `/models/search?brand_id=${brandId.value}&q=${encodeURIComponent(modelSearch.value)}`);
+                const models = await response.json();
                 modelResults.innerHTML = '';
-            };
-            modelResults.appendChild(item);
-        });
-    });
-</script>
-@endpush
+                models.forEach(model => {
+                    const item = document.createElement('button');
+                    item.type = 'button';
+                    item.className = 'list-group-item list-group-item-action';
+                    item.textContent = model.name;
+                    item.onclick = () => {
+                        modelSearch.value = model.name;
+                        modelId.value = model.id;
+                        modelResults.innerHTML = '';
+                    };
+                    modelResults.appendChild(item);
+                });
+            });
+        </script>
+    @endpush

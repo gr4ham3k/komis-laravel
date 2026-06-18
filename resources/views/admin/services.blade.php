@@ -368,7 +368,7 @@
 <div class="modal fade" id="createServiceModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
-            <form method="POST" action="{{ route('admin.services.store') }}">
+            <form method="POST" action="{{ route('admin.services.store') }}" enctype="multipart/form-data">
                 @csrf
 
                 <div class="modal-header border-0 pb-0">
@@ -381,6 +381,15 @@
 
                 <div class="modal-body pt-0">
                     @include('admin.partials.service-form', ['service' => null, 'users' => $users])
+
+                    <hr>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-images me-1"></i>Zdjęcia
+                        </label>
+                        <input type="file" name="images[]" class="form-control" multiple accept="image/*">
+                        <small class="text-muted">Maks. 2 MB na zdjęcie.</small>
+                    </div>
                 </div>
 
                 <div class="modal-footer border-0 pt-0">
@@ -397,7 +406,7 @@
     <div class="modal fade" id="editServiceModal-{{ $service->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
-                <form method="POST" action="{{ route('admin.services.update', $service->id) }}">
+                <form method="POST" action="{{ route('admin.services.update', $service->id) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PATCH')
 
@@ -410,35 +419,47 @@
                     </div>
 
                     <div class="modal-body pt-0">
-                        <!-- TYLKO PODGLĄD ZDJĘĆ - bez możliwości edycji -->
                         @if($service->images->count() > 0)
-                            <div class="alert alert-info mb-3">
-                                <i class="fas fa-info-circle me-2"></i>
-                                <strong>Informacja:</strong> Zdjęcia można dodawać/edytować tylko z poziomu panelu użytkownika.
-                            </div>
-
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">
-                                    <i class="fas fa-images me-1"></i>Zdjęcia usługi (podgląd)
+                                    <i class="fas fa-images me-1"></i>Zdjęcia usługi
                                 </label>
-                                <div class="d-flex flex-wrap gap-2">
+                                <div class="d-flex flex-wrap gap-3">
                                     @foreach($service->images as $image)
                                         <div class="text-center" style="width: 100px;">
-                                            <img src="{{ asset('storage/' . $image->file_name) }}"
-                                                 class="img-thumbnail"
-                                                 style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
-                                                 onclick="window.open('{{ asset('storage/' . $image->file_name) }}', '_blank')"
-                                                 data-bs-toggle="tooltip"
-                                                 title="Kliknij aby powiększyć">
+                                            <div class="position-relative">
+                                                <img src="{{ asset('storage/' . $image->file_name) }}"
+                                                     class="img-thumbnail"
+                                                     style="width: 80px; height: 80px; object-fit: cover;">
+                                                <div class="form-check position-absolute top-0 end-0 m-0">
+                                                    <input class="form-check-input" type="checkbox"
+                                                           name="delete_images[]" value="{{ $image->id }}"
+                                                           id="del_img_{{ $image->id }}"
+                                                           style="border: 2px solid #dc3545;">
+                                                    <label class="form-check-label" for="del_img_{{ $image->id }}" style="font-size: 0;">
+                                                        Usuń
+                                                    </label>
+                                                </div>
+                                            </div>
                                             <small class="text-muted d-block" style="font-size: 10px;">{{ Str::limit($image->original_name, 15) }}</small>
                                         </div>
                                     @endforeach
                                 </div>
+                                <small class="text-muted">Zaznacz zdjęcia do usunięcia.</small>
                             </div>
                             <hr>
                         @endif
 
                         @include('admin.partials.service-form', ['service' => $service, 'users' => $users])
+
+                        <hr>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-upload me-1"></i>Dodaj nowe zdjęcia
+                            </label>
+                            <input type="file" name="new_images[]" class="form-control" multiple accept="image/*">
+                            <small class="text-muted">Maks. 2 MB na zdjęcie.</small>
+                        </div>
                     </div>
 
                     <div class="modal-footer border-0 pt-0">

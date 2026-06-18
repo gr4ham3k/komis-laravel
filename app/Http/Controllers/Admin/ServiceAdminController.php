@@ -3,15 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Image;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ServiceAdminController extends Controller
 {
     public function index()
     {
-        $services = Service::with('user')
+        $services = Service::with('user', 'images')
             ->latest()
             ->paginate(15);
         $users = User::orderBy('name')->get();
@@ -23,9 +25,29 @@ class ServiceAdminController extends Controller
     {
         $validated = $this->validateService($request);
 
-        Service::create($validated + [
+        $service = Service::create($validated + [
             'views_count' => 0,
         ]);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $imageFile) {
+                if ($imageFile && $imageFile->isValid()) {
+                    $uuid = (string) Str::uuid();
+                    $extension = $imageFile->getClientOriginalExtension();
+                    $fileName = 'services/' . $uuid . '.' . $extension;
+
+                    $imageFile->storeAs('services', $uuid . '.' . $extension, 'public');
+
+                    $image = Image::create([
+                        'file_name' => $fileName,
+                        'original_name' => $imageFile->getClientOriginalName(),
+                        'file_type' => $imageFile->getClientMimeType(),
+                    ]);
+
+                    $service->images()->attach($image->id);
+                }
+            }
+        }
 
         return redirect()
             ->route('admin.services.index')
@@ -36,6 +58,42 @@ class ServiceAdminController extends Controller
     {
         $service = Service::findOrFail($id);
         $service->update($this->validateService($request));
+
+        // Usuwanie zaznaczonych zdjęć
+        if ($request->has('delete_images')) {
+            foreach ($request->delete_images as $imageId) {
+                $image = Image::find($imageId);
+                if ($image) {
+                    $filePath = storage_path('app/public/' . $image->file_name);
+                    if (file_exists($filePath)) {
+                        unlink($filePath);
+                    }
+                    $service->images()->detach($imageId);
+                    $image->delete();
+                }
+            }
+        }
+
+        // Dodawanie nowych zdjęć
+        if ($request->hasFile('new_images')) {
+            foreach ($request->file('new_images') as $imageFile) {
+                if ($imageFile && $imageFile->isValid()) {
+                    $uuid = (string) Str::uuid();
+                    $extension = $imageFile->getClientOriginalExtension();
+                    $fileName = 'services/' . $uuid . '.' . $extension;
+
+                    $imageFile->storeAs('services', $uuid . '.' . $extension, 'public');
+
+                    $image = Image::create([
+                        'file_name' => $fileName,
+                        'original_name' => $imageFile->getClientOriginalName(),
+                        'file_type' => $imageFile->getClientMimeType(),
+                    ]);
+
+                    $service->images()->attach($image->id);
+                }
+            }
+        }
 
         return redirect()
             ->route('admin.services.index')
@@ -48,7 +106,7 @@ class ServiceAdminController extends Controller
 
         // Usuwanie wszystkich powiązanych zdjęć z dysku i bazy
         foreach ($service->images as $image) {
-            $filePath = storage_path('app/public/services/' . $image->file_name);
+            $filePath = storage_path('app/public/' . $image->file_name);
             if (file_exists($filePath)) {
                 unlink($filePath);
             }
@@ -71,6 +129,12 @@ class ServiceAdminController extends Controller
             'price' => 'required|numeric|min:0',
             'city' => 'required|string|max:255',
             'status' => 'required|in:active,inactive,deleted',
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|image|max:2048',
+            'delete_images' => 'nullable|array',
+            'delete_images.*' => 'exists:images,id',
+            'new_images' => 'nullable|array',
+            'new_images.*' => 'image|max:2048',
         ]);
     }
 }

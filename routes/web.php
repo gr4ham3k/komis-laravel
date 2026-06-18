@@ -37,7 +37,7 @@ Route::post('/logout', [AuthController::class, 'logout'])
 
 // Geocoding proxy routes (must be before listings resource)
 Route::get('/geocode', [ListingController::class, 'geocode']);
-Route::get('/geocode/reverse', [ListingController::class, 'reverseGeocode']);
+Route::get('/geocode/reverse', [ListingController::class, 'geocodeReverse']);
 
 Route::get('/listings', [ListingController::class, 'index'])->name('listings.index');
 Route::get('/listings/{listing}', [ListingController::class, 'show'])
@@ -54,7 +54,9 @@ Route::post('/messages', [MessageController::class, 'store'])->name('messages.st
 Route::get('/conversations/{id}/messages', [MessageController::class, 'index']);
 
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
-Route::get('/services/{id}', [ServiceController::class, 'show'])->name('services.show');
+Route::get('/services/{id}', [ServiceController::class, 'show'])
+    ->whereNumber('id')
+    ->name('services.show');
 
 Route::post('/tags', [TagController::class, 'store'])->name('admin.dictionaries.tags.store');
 Route::delete('/tags/{id}', [TagController::class, 'destroy'])->name('admin.dictionaries.tags.destroy');

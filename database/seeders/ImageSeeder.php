@@ -62,8 +62,14 @@ class ImageSeeder extends Seeder
         ];
 
         foreach ($images as $img) {
+            if (Image::where('original_name', $img)->exists()) {
+                continue;
+            }
 
             $sourcePath = database_path('seed-images/' . $img);
+            if (!file_exists($sourcePath)) {
+                continue;
+            }
 
             $uuid = (string) Str::uuid() . '.jpg';
 

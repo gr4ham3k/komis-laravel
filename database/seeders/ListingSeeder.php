@@ -17,7 +17,14 @@ class ListingSeeder extends Seeder
 {
     public function run(): void
     {
+        if (Listing::exists()) {
+            return;
+        }
+
         $users = User::where('is_admin', false)->get();
+        if ($users->isEmpty()) {
+            $users = User::factory(3)->create();
+        }
 
         $diesel = Fuel::where('name', 'Diesel')->first();
         $petrol = Fuel::where('name', 'Benzyna')->first();
@@ -433,6 +440,9 @@ class ListingSeeder extends Seeder
 
             $brand = Brand::where('name', $car['brand'])->first();
             $model = CarModel::where('name', $car['model'])->first();
+            if (!$brand || !$model) {
+                continue;
+            }
 
             $c = $coords[$car['city']] ?? [
                 'lat' => 52.0693,

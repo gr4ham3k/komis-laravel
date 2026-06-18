@@ -51,33 +51,16 @@ class CarDataSeeder extends Seeder
             }
         }
 
-        if (Fuel::count() === 0) {
-            Fuel::insert([
-                ['name' => 'Benzyna', 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Diesel', 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Hybryda', 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Elektryczny', 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'LPG', 'created_at' => now(), 'updated_at' => now()],
-            ]);
+        foreach (['Benzyna', 'Diesel', 'Hybryda', 'Elektryczny', 'LPG'] as $fuel) {
+            Fuel::firstOrCreate(['name' => $fuel]);
         }
 
-        if (Transmission::count() === 0) {
-            Transmission::insert([
-                ['name' => 'Manualna', 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Automatyczna', 'created_at' => now(), 'updated_at' => now()],
-            ]);
+        foreach (['Manualna', 'Automatyczna'] as $transmission) {
+            Transmission::firstOrCreate(['name' => $transmission]);
         }
 
-        if (BodyType::count() === 0) {
-            BodyType::insert([
-                ['name' => 'Sedan', 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Hatchback', 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'SUV', 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Coupe', 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Kombi', 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Kabriolet', 'created_at' => now(), 'updated_at' => now()],
-                ['name' => 'Minivan', 'created_at' => now(), 'updated_at' => now()],
-            ]);
+        foreach (['Sedan', 'Hatchback', 'SUV', 'Coupe', 'Kombi', 'Kabriolet', 'Minivan'] as $bodyType) {
+            BodyType::firstOrCreate(['name' => $bodyType]);
         }
     }
 }

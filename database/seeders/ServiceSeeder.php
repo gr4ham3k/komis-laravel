@@ -14,18 +14,23 @@ class ServiceSeeder extends Seeder
 {
     public function run(): void
     {
-        $owner = User::where('email', 'test@example.com')->first();
-
-        if (!$owner) {
-            $owner = User::factory()->create([
-                'name' => 'Mechanik Kowalski',
-                'email' => 'mechanik@example.com',
-            ]);
+        if (Service::exists()) {
+            return;
         }
 
-        $reviewers = User::whereNotIn('id', [$owner->id])->take(3)->get();
+        $owner = User::firstOrCreate(
+            ['email' => 'mechanik@example.com'],
+            [
+                'name' => 'Mechanik Kowalski',
+                'password' => bcrypt('password'),
+            ]
+        );
+
+        $reviewers = User::whereNotIn('id', [$owner->id])->take(3)->get()->values();
         if ($reviewers->count() < 3) {
-            $reviewers = User::factory(3 - $reviewers->count())->create();
+            $reviewers = $reviewers
+                ->merge(User::factory(3 - $reviewers->count())->create())
+                ->values();
         }
 
         $services = [

@@ -20,7 +20,7 @@ class ListingCompareTest extends TestCase
     {
         $this->get(route('compare.index'))
             ->assertOk()
-            ->assertSee('Lista porownania jest pusta');
+            ->assertSee('Lista porównania jest pusta');
     }
 
     public function test_user_can_add_and_remove_listing_from_compare_list(): void
@@ -41,7 +41,7 @@ class ListingCompareTest extends TestCase
 
         $this->get(route('compare.index'))
             ->assertOk()
-            ->assertSee('Lista porownania jest pusta');
+            ->assertSee('Lista porównania jest pusta');
     }
 
     private function makeListing(): Listing

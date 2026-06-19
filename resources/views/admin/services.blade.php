@@ -240,6 +240,16 @@
         </div>
     @endif
 
+    <form method="GET" action="{{ route('admin.services.index') }}" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control" placeholder="Szukaj usługi (tytuł, miasto, użytkownik...)" value="{{ request('search') }}">
+            <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i> Szukaj</button>
+            @if(request('search'))
+                <a href="{{ route('admin.services.index') }}" class="btn btn-outline-secondary"><i class="fas fa-times"></i> Wyczyść</a>
+            @endif
+        </div>
+    </form>
+
     <div class="admin-panel">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">

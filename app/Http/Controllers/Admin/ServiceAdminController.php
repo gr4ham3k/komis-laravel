@@ -11,11 +11,23 @@ use Illuminate\Support\Str;
 
 class ServiceAdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $services = Service::with('user', 'images')
-            ->latest()
-            ->paginate(15);
+        $query = Service::with('user', 'images');
+
+        if ($search = $request->get('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'ilike', "%{$search}%")
+                    ->orWhere('description', 'ilike', "%{$search}%")
+                    ->orWhere('city', 'ilike', "%{$search}%")
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('name', 'ilike', "%{$search}%")
+                            ->orWhere('email', 'ilike', "%{$search}%");
+                    });
+            });
+        }
+
+        $services = $query->latest()->paginate(15);
         $users = User::orderBy('name')->get();
 
         return view('admin.services', compact('services', 'users'));

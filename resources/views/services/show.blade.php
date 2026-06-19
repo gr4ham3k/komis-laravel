@@ -103,7 +103,11 @@
                     <h4>Opinie klientów</h4>
 
                     @auth
-                        @if ($userReview)
+                        @if(Auth::id() === $service->user_id)
+                            <div class="alert alert-info mb-4">
+                                <i class="fas fa-info-circle me-1"></i> Zapoznaj się z opiniami użytkowników
+                            </div>
+                        @elseif ($userReview)
                             <form method="POST" action="{{ route('services.review.update', $service->id) }}" class="mb-4 border rounded p-3 bg-light">
                                 @csrf
                                 @method('PUT')

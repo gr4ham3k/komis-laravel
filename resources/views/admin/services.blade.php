@@ -364,6 +364,13 @@
     </div>
 </div>
 
+<!-- Globalna lista użytkowników do wyszukiwarki -->
+<datalist id="global-users-list">
+    @foreach($users as $user)
+        <option value="{{ $user->name }} ({{ $user->email }})" data-id="{{ $user->id }}">
+    @endforeach
+</datalist>
+
 <!-- Modal Dodawania (bez zdjęć w tym widoku) -->
 <div class="modal fade" id="createServiceModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -380,7 +387,7 @@
                 </div>
 
                 <div class="modal-body pt-0">
-                    @include('admin.partials.service-form', ['service' => null, 'users' => $users])
+                    @include('admin.partials.service-form', ['service' => null, 'users' => $users, 'prefix' => 'create'])
 
                     <hr>
                     <div class="mb-3">
@@ -450,7 +457,7 @@
                             <hr>
                         @endif
 
-                        @include('admin.partials.service-form', ['service' => $service, 'users' => $users])
+                        @include('admin.partials.service-form', ['service' => $service, 'users' => $users, 'prefix' => 'edit-' . $service->id])
 
                         <hr>
                         <div class="mb-3">
@@ -548,6 +555,19 @@
 
 @endsection
 
+@push('styles')
+    <style>
+        #map-create, [id^="map-edit-"] {
+            z-index: 1;
+        }
+        #createServiceModal .modal-body,
+        [id^="editServiceModal-"] .modal-body {
+            max-height: 75vh;
+            overflow-y: auto;
+        }
+    </style>
+@endpush
+
 @push('scripts')
 <script>
 // Przechowywanie danych galerii
@@ -614,6 +634,138 @@ document.addEventListener('DOMContentLoaded', function() {
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function(tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // --- Mapy Leaflet dla modali ---
+    const mapInstances = [];
+
+    function initMap(prefix, defaultCity) {
+        const map = L.map('map-' + prefix).setView([50.0413, 21.9990], 6);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        let marker;
+        const cityInput = document.getElementById('city-' + prefix);
+
+        function setMapStatus(text) {
+            document.getElementById('map-status-' + prefix).textContent = text;
+        }
+
+        if (defaultCity) {
+            setMapStatus('Wczytywanie lokalizacji...');
+            fetch(`/geocode?q=${encodeURIComponent(defaultCity)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        const lat = parseFloat(data[0].lat);
+                        const lng = parseFloat(data[0].lon);
+                        map.setView([lat, lng], 10);
+                        marker = L.marker([lat, lng]).addTo(map);
+                        setMapStatus('Aktualna lokalizacja: ' + defaultCity);
+                    } else {
+                        setMapStatus(defaultCity + ' (nie znaleziono na mapie)');
+                    }
+                })
+                .catch(function() {
+                    setMapStatus('Nie udało się wczytać lokalizacji');
+                });
+        }
+
+        map.on('click', function(e) {
+            if (marker) map.removeLayer(marker);
+            marker = L.marker(e.latlng).addTo(map);
+            setMapStatus('Pobieram nazwę miasta...');
+            fetch(`/geocode/reverse?lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+                .then(r => r.json())
+                .then(data => {
+                    const city = data.address?.city || data.address?.town || data.address?.village || '';
+                    cityInput.value = city;
+                    setMapStatus(city ? 'Wybrano: ' + city : 'Nie rozpoznano miasta');
+                })
+                .catch(function() {
+                    setMapStatus('Błąd geokodowania');
+                });
+        });
+
+        function searchLocation() {
+            const query = document.getElementById('map-search-' + prefix).value.trim();
+            if (!query) return;
+            setMapStatus('Szukam lokalizacji...');
+            fetch(`/geocode?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.length) {
+                        setMapStatus('Nie znaleziono lokalizacji');
+                        return;
+                    }
+                    const lat = parseFloat(data[0].lat);
+                    const lng = parseFloat(data[0].lon);
+                    map.setView([lat, lng], 10);
+                    if (marker) map.removeLayer(marker);
+                    marker = L.marker([lat, lng]).addTo(map);
+                    cityInput.value = data[0].address?.city || data[0].address?.town || data[0].address?.village || data[0].display_name?.split(',')[0] || '';
+                    setMapStatus('Znaleziono: ' + cityInput.value);
+                })
+                .catch(function() {
+                    setMapStatus('Błąd wyszukiwania');
+                });
+        }
+
+        document.getElementById('map-search-btn-' + prefix).addEventListener('click', searchLocation);
+        document.getElementById('map-search-' + prefix).addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); searchLocation(); }
+        });
+
+        mapInstances.push(map);
+    }
+
+    initMap('create', '');
+
+    @foreach($services as $service)
+        initMap('edit-{{ $service->id }}', '{{ $service->city }}');
+    @endforeach
+
+    // --- Wyszukiwarka użytkowników dla modali ---
+    function initUserSearch(prefix) {
+        const searchInput = document.getElementById('user-search-' + prefix);
+        const hiddenInput = document.getElementById('user-id-' + prefix);
+        if (!searchInput || !hiddenInput) return;
+
+        const datalist = document.getElementById('global-users-list');
+
+        searchInput.addEventListener('input', function() {
+            const options = datalist.options;
+            let foundId = '';
+            for (let opt of options) {
+                if (opt.value === this.value) {
+                    foundId = opt.dataset.id;
+                    break;
+                }
+            }
+            hiddenInput.value = foundId;
+        });
+
+        searchInput.addEventListener('change', function() {
+            if (!this.value) {
+                hiddenInput.value = '';
+            }
+        });
+    }
+
+    initUserSearch('create');
+    @foreach($services as $service)
+        initUserSearch('edit-{{ $service->id }}');
+    @endforeach
+
+    // Poprawa renderowania Leaflet w modalach Bootstrap
+    document.querySelectorAll('.modal').forEach(function(modalEl) {
+        modalEl.addEventListener('shown.bs.modal', function() {
+            setTimeout(function() {
+                mapInstances.forEach(function(m) { m.invalidateSize(); });
+            }, 200);
+        });
     });
 });
 </script>

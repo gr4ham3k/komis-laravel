@@ -9,9 +9,18 @@ use Illuminate\Support\Facades\Hash;
 
 class UserAdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::withCount('listings')->latest()->paginate(20);
+        $query = User::withCount('listings');
+
+        if ($search = $request->get('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'ilike', "%{$search}%")
+                    ->orWhere('email', 'ilike', "%{$search}%");
+            });
+        }
+
+        $users = $query->latest()->paginate(20);
         return view('admin.users', compact('users'));
     }
 

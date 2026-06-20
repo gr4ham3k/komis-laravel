@@ -14,11 +14,22 @@ use Illuminate\Http\Request;
 
 class ListingAdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $listings = Listing::with(['brand', 'carModel', 'fuel', 'transmission', 'bodyType', 'tags', 'images', 'user'])
-            ->latest()
-            ->paginate(20);
+        $query = Listing::with(['brand', 'carModel', 'fuel', 'transmission', 'bodyType', 'tags', 'images', 'user']);
+
+        if ($search = $request->get('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'ilike', "%{$search}%")
+                    ->orWhere('city', 'ilike', "%{$search}%")
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('name', 'ilike', "%{$search}%")
+                            ->orWhere('email', 'ilike', "%{$search}%");
+                    });
+            });
+        }
+
+        $listings = $query->latest()->paginate(20);
 
         return view('admin.listings.index', compact('listings'));
     }

@@ -20,7 +20,10 @@ class ListingImageController extends Controller
     {
         $request->validate([
             'images' => 'required|array|min:1',
-            'images.*' => 'image|max:2048',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+        ], [
+            'images.*.mimes' => 'Dozwolone są tylko pliki JPG, JPEG, PNG i WEBP.',
+            'images.*.image' => 'Przesłany plik musi być obrazem.',
         ]);
 
         foreach ($request->file('images') as $imageFile) {

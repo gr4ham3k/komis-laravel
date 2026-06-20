@@ -2,6 +2,10 @@
 
 set -e
 
+echo "Fixing permissions..."
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache || true
+chmod -R 775 /var/www/storage /var/www/bootstrap/cache || true
+
 if [ ! -f "/var/www/.env" ]; then
   echo "Creating .env from .env.example..."
   cp /var/www/.env.example /var/www/.env
@@ -26,6 +30,6 @@ php artisan db:seed --force
 
 php artisan storage:link --force 2>/dev/null || true
 
-php artisan config:cache && php artisan route:cache && php artisan view:cache
+php artisan config:cache && php artisan route:cache
 
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

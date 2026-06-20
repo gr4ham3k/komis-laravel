@@ -347,27 +347,20 @@ class ListingController extends Controller
     {
         $query = $request->q;
 
-        if (strlen($query) < 2) {
-            $brands = Brand::where('name', 'ilike', $query . '%')
-                ->orderBy('name')
-                ->limit(10)
-                ->get();
-        } else {
-            $brands = Brand::where('name', 'ilike', $query . '%')
-                ->orderByRaw("similarity(name, ?) DESC", [$query])
-                ->orderBy('name')
-                ->limit(10)
-                ->get();
-
-            if ($brands->count() < 10) {
-                $fallback = Brand::where('name', 'not ilike', $query . '%')
-                    ->whereRaw("similarity(name, ?) > 0.4", [$query])
-                    ->orderByRaw("similarity(name, ?) DESC", [$query])
-                    ->limit(10 - $brands->count())
-                    ->get();
-                $brands = $brands->merge($fallback);
-            }
-        }
+        $brands = Brand::query()
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'ilike', $query . '%')
+                    ->orWhereRaw("similarity(name, ?) > 0.2", [$query]);
+            })
+            ->orderByRaw("
+            CASE
+                WHEN name ILIKE ? THEN 0
+                ELSE 1
+            END
+        ", [$query . '%'])
+            ->orderByRaw("similarity(name, ?) DESC", [$query])
+            ->limit(10)
+            ->get();
 
         return response()->json($brands);
     }
@@ -378,7 +371,7 @@ class ListingController extends Controller
         $query = $request->q;
         $brandId = $request->brand_id;
 
-        if (strlen($query) < 3) {
+        if (strlen($query) < 2) {
             return CarModel::where('brand_id', $brandId)
                 ->where('name', 'ilike', $query . '%')
                 ->orderBy('name')
@@ -387,7 +380,13 @@ class ListingController extends Controller
         }
 
         return CarModel::where('brand_id', $brandId)
-            ->whereRaw("name % ?", [$query])
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'ilike', $query . '%')
+                    ->orWhereRaw("similarity(name, ?) > 0.2", [$query]);
+            })
+            ->orderByRaw("
+            CASE WHEN name ILIKE ? THEN 0 ELSE 1 END
+        ", [$query . '%'])
             ->orderByRaw("similarity(name, ?) DESC", [$query])
             ->limit(10)
             ->get();

@@ -14,10 +14,6 @@ class ServiceSeeder extends Seeder
 {
     public function run(): void
     {
-        if (Service::exists()) {
-            return;
-        }
-
         $owner = User::firstOrCreate(
             ['email' => 'mechanik@example.com'],
             [
@@ -65,28 +61,51 @@ class ServiceSeeder extends Seeder
         ];
 
         foreach ($services as $serviceData) {
-            $service = Service::create([
-                'user_id' => $owner->id,
-                'title' => $serviceData['title'],
-                'description' => $serviceData['description'],
-                'price' => $serviceData['price'],
-                'city' => $serviceData['city'],
-                'status' => 'active',
-                'views_count' => rand(0, 100),
-            ]);
+            $service = Service::firstOrCreate(
+                [
+                    'title' => $serviceData['title'],
+                    'city' => $serviceData['city'],
+                ],
+                [
+                    'user_id' => $owner->id,
+                    'description' => $serviceData['description'],
+                    'price' => $serviceData['price'],
+                    'status' => 'active',
+                    'views_count' => rand(0, 100),
+                ]
+            );
 
             $sourcePath = database_path('seed-images/' . $serviceData['image']);
             if (file_exists($sourcePath)) {
-                $uuid = (string) Str::uuid() . '.jpg';
-                $storagePath = 'services/' . $uuid;
-                Storage::disk('public')->put($storagePath, file_get_contents($sourcePath));
+                $serviceImage = $service->images()
+                    ->where('original_name', $serviceData['image'])
+                    ->first();
 
-                $srvImage = Image::create([
-                    'original_name' => $serviceData['image'],
-                    'file_name' => $storagePath,
-                    'file_type' => 'image/jpeg',
-                ]);
-                $service->images()->attach($srvImage->id, ['sort_order' => 0]);
+                if (!$serviceImage) {
+                    $serviceImage = Image::where('original_name', $serviceData['image'])
+                        ->where('file_name', 'like', 'services/%')
+                        ->first();
+                }
+
+                if (!$serviceImage) {
+                    $uuid = (string) Str::uuid() . '.jpg';
+                    $storagePath = 'services/' . $uuid;
+
+                    $serviceImage = Image::create([
+                        'original_name' => $serviceData['image'],
+                        'file_name' => $storagePath,
+                        'file_type' => 'image/jpeg',
+                    ]);
+                }
+
+                Storage::disk('public')->put(
+                    $serviceImage->file_name,
+                    file_get_contents($sourcePath)
+                );
+
+                if (!$service->images()->whereKey($serviceImage->id)->exists()) {
+                    $service->images()->attach($serviceImage->id, ['sort_order' => 0]);
+                }
             }
 
             $reviews = [
@@ -95,13 +114,15 @@ class ServiceSeeder extends Seeder
                 ['rating' => 5, 'comment' => 'Szybko i profesjonalnie.'],
             ];
 
-            foreach ($reviews as $i => $reviewData) {
-                ServiceReview::create([
-                    'service_id' => $service->id,
-                    'user_id' => $reviewers[$i]->id,
-                    'rating' => $reviewData['rating'],
-                    'comment' => $reviewData['comment'],
-                ]);
+            if (!$service->reviews()->exists()) {
+                foreach ($reviews as $i => $reviewData) {
+                    ServiceReview::create([
+                        'service_id' => $service->id,
+                        'user_id' => $reviewers[$i]->id,
+                        'rating' => $reviewData['rating'],
+                        'comment' => $reviewData['comment'],
+                    ]);
+                }
             }
         }
     }

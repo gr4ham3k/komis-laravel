@@ -107,28 +107,15 @@ Aplikacja pełni funkcję platformy do wystawiania i przeglądania ogłoszeń mo
    cd Komis-Laravel
    ```
 
-2. **Uruchomienie projektu**
+2. **Pierwsze uruchomienie projektu**
    ```bash
-   docker compose up
+   docker compose up -d --build
    ```
 
-3. **Konfiguracja środowiska**
+3. **Codzienne użycie**
    ```bash
-   cp .env.example .env
-   ```
-   Edytuj `.env`:
-   ```
-   DB_CONNECTION=pgsql
-   DB_HOST=db
-   DB_PORT=5432
-   DB_DATABASE=laravel
-   DB_USERNAME=laravel
-   DB_PASSWORD=secret
-   ```
-
-4. **Generowanie klucza**
-   ```bash
-   docker compose run --rm web php artisan key:generate
+   docker compose up -d
+   docker compose down
    ```
 
 ## Kierunki rozwoju
